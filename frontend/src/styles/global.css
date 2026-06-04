@@ -23,6 +23,8 @@
   
   --shadow-card: 0 4px 32px rgba(0, 0, 0, 0.6);
   --shadow-elevated: 0 8px 48px rgba(0, 0, 0, 0.8);
+  --shadow-primary: 0 4px 20px rgba(212, 160, 23, 0.4);
+  --shadow-primary-hover: 0 6px 32px rgba(212, 160, 23, 0.6);
   --glass-bg: rgba(255, 255, 255, 0.03);
 
   /* Typography */
@@ -50,6 +52,8 @@
   
   --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.08);
   --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-primary: 0 4px 20px rgba(212, 160, 23, 0.15);
+  --shadow-primary-hover: 0 6px 32px rgba(212, 160, 23, 0.25);
   --glass-bg: rgba(0, 0, 0, 0.02);
 }
 
@@ -187,11 +191,11 @@ button {
 .btn-primary {
   background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dim));
   color: #000000;
-  box-shadow: 0 4px 20px rgba(212, 160, 23, 0.4);
+  box-shadow: var(--shadow-primary);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 6px 32px rgba(212, 160, 23, 0.6);
+  box-shadow: var(--shadow-primary-hover);
   transform: translateY(-2px);
 }
 

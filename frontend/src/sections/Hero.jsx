@@ -107,19 +107,13 @@ export default function Hero({ setView }) {
             <motion.div className="hero__ring hero__ring--2" animate={{ rotate: -360 }} transition={{ duration: 35, repeat: Infinity, ease: 'linear' }} />
             
             <motion.div className="hero__product-wrap" variants={float} animate="animate">
-                <img 
-                  src="/sports-car.png" 
-                  alt="High Performance Sports Car" 
-                  className="hero__product-img" 
-                  style={{ 
-                    width: '100%', 
-                    maxWidth: '480px', 
-                    height: 'auto', 
-                    filter: 'drop-shadow(0 20px 40px rgba(212, 160, 23, 0.35))',
-                    borderRadius: '16px',
-                    objectFit: 'cover'
-                  }} 
-                />
+                <div className="hero__img-frame">
+                  <img 
+                    src="/sports-car.png" 
+                    alt="High Performance Sports Car" 
+                    className="hero__product-img" 
+                  />
+                </div>
             </motion.div>
           </div>
         </motion.div>
