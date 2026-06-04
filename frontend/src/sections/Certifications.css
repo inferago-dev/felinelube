@@ -4,7 +4,7 @@
 
 .certs {
   padding: var(--section-padding);
-  background: var(--color-black);
+  background: var(--color-bg);
   position: relative;
   overflow: hidden;
 }
@@ -114,7 +114,7 @@
 .cert-card__title {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--color-white);
+  color: var(--color-text);
   letter-spacing: -0.02em;
   line-height: 1.25;
   position: relative;
@@ -123,7 +123,7 @@
 
 .cert-card__desc {
   font-size: 0.82rem;
-  color: var(--color-gray);
+  color: var(--color-text-dim);
   line-height: 1.7;
   margin: 0;
   position: relative;

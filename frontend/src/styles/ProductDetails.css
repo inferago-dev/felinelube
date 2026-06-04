@@ -3,8 +3,8 @@
    ============================================ */
 
 .product-page {
-  background: var(--color-black);
-  color: var(--color-white);
+  background: var(--color-bg);
+  color: var(--color-text);
   padding-top: 100px; /* Offset for navbar */
 }
 
@@ -114,12 +114,12 @@
 .prod-info__price {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--color-white);
+  color: var(--color-text);
 }
 
 .prod-info__desc {
   font-size: 0.95rem;
-  color: var(--color-gray);
+  color: var(--color-text-dim);
   line-height: 1.8;
 }
 
@@ -146,7 +146,7 @@
 
 .qty-btn {
   background: transparent;
-  color: var(--color-white);
+  color: var(--color-text);
   padding: 0.75rem 1rem;
   font-size: 1rem;
   transition: background 0.2s;
@@ -196,7 +196,7 @@
 
 .specs-label {
   font-weight: 600;
-  color: var(--color-gray-light);
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 
@@ -244,14 +244,14 @@
 .pkg-val {
   font-size: 2rem;
   font-weight: 900;
-  color: var(--color-white);
+  color: var(--color-text);
   margin-bottom: 0.5rem;
 }
 
 .pkg-label {
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--color-gray);
+  color: var(--color-text-dim);
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
