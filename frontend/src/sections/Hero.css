@@ -321,6 +321,10 @@
   .hero__stats {
     justify-content: center;
   }
+  
+  .hero__badge {
+    margin: 0 auto;
+  }
 
   .hero__spec-tag--left { left: 0; }
   .hero__spec-tag--right { right: 0; }
@@ -330,4 +334,11 @@
   .hero__heading { font-size: clamp(2rem, 8vw, 2.8rem); }
   .hero__product-svg { width: 200px; height: 270px; }
   .hero__actions { justify-content: center; }
+}
+
+@media (max-width: 480px) {
+  .hero__heading { font-size: 2rem; }
+  .hero__product-svg { width: 160px; height: 216px; }
+  .hero__stats { flex-direction: column; gap: 1rem; border-top: none; padding-top: 0; }
+  .hero__stat-value { font-size: 1.4rem; }
 }

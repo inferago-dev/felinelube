@@ -159,6 +159,18 @@
   .navbar__logo-img {
     height: 40px;
   }
+  .navbar__inner {
+    padding: 0 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar__inner {
+    padding: 0 1rem;
+  }
+  .navbar__logo-img {
+    height: 32px;
+  }
 }
 
 /* Mobile Menu */

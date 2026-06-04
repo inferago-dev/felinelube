@@ -220,8 +220,19 @@ button {
   :root {
     --section-padding: 5rem 1.25rem;
   }
-
   .container {
     padding: 0 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --section-padding: 3.5rem 1rem;
+  }
+  .container {
+    padding: 0 1rem;
+  }
+  .section-title {
+    font-size: 2rem;
   }
 }
