@@ -11,7 +11,7 @@ export default function AdminOrders() {
   const fetchOrders = async () => {
     try {
       setLoading(true)
-      const res = await fetch('https://felinelube-production.up.railway.app/api/orders/admin/all')
+      const res = await fetch('https://felinelube.onrender.com/api/orders/admin/all')
       if (!res.ok) throw new Error('Failed to fetch orders')
       const data = await res.json()
       setOrders(data)
@@ -28,7 +28,7 @@ export default function AdminOrders() {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      const res = await fetch(`https://felinelube-production.up.railway.app/api/orders/admin/${id}`, {
+      const res = await fetch(`https://felinelube.onrender.com/api/orders/admin/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })

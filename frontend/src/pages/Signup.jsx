@@ -26,7 +26,7 @@ export default function Signup({ setView }) {
 
     try {
       // TODO: Replace with actual backend call
-      const response = await fetch('https://felinelube-production.up.railway.app/api/auth/register', {
+      const response = await fetch('https://felinelube.onrender.com/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
