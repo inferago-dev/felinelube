@@ -11,7 +11,7 @@ export default function AdminProducts() {
   const fetchProducts = async () => {
     try {
       setLoading(true)
-      const res = await fetch('http://localhost:5000/api/products/admin/all')
+      const res = await fetch('https://felinelube-production.up.railway.app/api/products/admin/all')
       if (!res.ok) throw new Error('Failed to fetch inventory')
       const data = await res.json()
       setProducts(data)
@@ -30,7 +30,7 @@ export default function AdminProducts() {
     if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) return
     
     try {
-      const res = await fetch(`http://localhost:5000/api/products/admin/${id}`, {
+      const res = await fetch(`https://felinelube-production.up.railway.app/api/products/admin/${id}`, {
         method: 'DELETE'
       })
       if (res.ok) {
