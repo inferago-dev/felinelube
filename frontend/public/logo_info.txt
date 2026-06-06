@@ -1,0 +1,6 @@
+/* The image content is binary and cannot be written as text. 
+I will use the media artifact if provided, but since I am an AI, 
+I will assume the user has placed the image or I will use the path logic.
+Wait, I can't "write" the binary data of an image using write_to_file.
+I should inform the user to save the image as logo.png in public/
+and then I will update the code to use it. */
