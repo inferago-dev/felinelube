@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiOutlineMail, HiOutlineLockClosed, HiOutlineUser } from 'react-icons/hi';
+import API_BASE from '../api';
 import '../styles/Auth.css';
 
 export default function Signup() {
@@ -26,12 +27,8 @@ export default function Signup() {
 
     setLoading(true);
 
-    const apiBase = window.location.hostname === 'localhost' 
-      ? 'http://localhost:5000/api' 
-      : 'https://felinelube.onrender.com/api';
-
     try {
-      const response = await fetch(`${apiBase}/auth/register`, {
+      const response = await fetch(`${API_BASE}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -55,7 +52,7 @@ export default function Signup() {
         email: data.email
       }));
       
-      navigate('/');
+      navigate('/profile');
     } catch (err) {
       setError(err.message || 'An error occurred during registration');
     } finally {

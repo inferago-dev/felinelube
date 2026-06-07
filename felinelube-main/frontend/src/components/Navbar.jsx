@@ -149,9 +149,12 @@ export default function Navbar() {
 
             <li 
               className="navbar__icon-link" 
-              onClick={() => navigate('/login')} 
+              onClick={() => {
+                const isAuth = localStorage.getItem('token');
+                navigate(isAuth ? '/profile' : '/login');
+              }} 
               style={{ cursor: 'pointer', marginLeft: '5px' }}
-              title="Login / Sign Up"
+              title="Profile / Login"
             >
               <HiOutlineUser className="navbar__cart-icon" />
             </li>

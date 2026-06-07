@@ -1,7 +1,8 @@
 // Central API configuration
 // Automatically switches between local dev and production
-const API_BASE = window.location.hostname === 'localhost'
-  ? 'http://localhost:5000/api'
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168');
+const API_BASE = isLocal
+  ? `http://${window.location.hostname}:5000/api`
   : 'https://felinelube.onrender.com/api'
 
 export default API_BASE

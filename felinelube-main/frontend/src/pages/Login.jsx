@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiOutlineMail, HiOutlineLockClosed } from 'react-icons/hi';
+import API_BASE from '../api';
 import '../styles/Auth.css';
 
 export default function Login() {
@@ -15,12 +16,8 @@ export default function Login() {
     setError('');
     setLoading(true);
 
-    const apiBase = window.location.hostname === 'localhost' 
-      ? 'http://localhost:5000/api' 
-      : 'https://felinelube.onrender.com/api';
-
     try {
-      const response = await fetch(`${apiBase}/auth/login`, {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -40,7 +37,7 @@ export default function Login() {
         email: data.email
       }));
       
-      navigate('/');
+      navigate('/profile');
     } catch (err) {
       setError(err.message || 'An error occurred during login');
     } finally {

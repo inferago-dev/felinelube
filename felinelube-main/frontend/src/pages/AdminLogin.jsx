@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiOutlineMail, HiOutlineLockClosed } from 'react-icons/hi';
+import API_BASE from '../api';
 import '../styles/Auth.css';
 
 export default function AdminLogin() {
@@ -15,12 +16,8 @@ export default function AdminLogin() {
     setError('');
     setLoading(true);
 
-    const apiBase = window.location.hostname === 'localhost' 
-      ? 'http://localhost:5000/api' 
-      : 'https://felinelube.onrender.com/api';
-
     try {
-      const response = await fetch(`${apiBase}/auth/admin/login`, {
+      const response = await fetch(`${API_BASE}/auth/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

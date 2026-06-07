@@ -12,12 +12,14 @@ const app = express();
 app.use(helmet());
 app.use(xss());
 app.use(cors({
-  origin: [
-    'http://localhost:5173',   // Vite dev server
-    'http://localhost:3000',   // fallback
-    'https://felinelube.onrender.com', // production frontend
-    'https://felinelube.vercel.app'    // vercel frontend
-  ],
+  origin: function(origin, callback) {
+    // Allow any localhost, 127.0.0.1, or 192.168.* for local dev
+    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('192.168.') || origin === 'https://felinelube.onrender.com' || origin === 'https://felinelube.vercel.app') {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());
