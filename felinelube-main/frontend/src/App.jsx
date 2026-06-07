@@ -16,6 +16,7 @@ import Shop from './sections/Shop'
 import ContactPage from './sections/ContactPage'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
+import Profile from './pages/Profile'
 
 /* Admin Components */
 import AdminLayout from './layouts/AdminLayout'
@@ -77,6 +78,7 @@ function PublicLayout() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/login" element={<Login setView={setView} />} />
           <Route path="/signup" element={<Signup setView={setView} />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
