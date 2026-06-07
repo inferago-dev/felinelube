@@ -16,6 +16,7 @@ app.use(cors({
     'http://localhost:5173',   // Vite dev server
     'http://localhost:3000',   // fallback
     'https://felinelube.onrender.com', // production frontend
+    'https://felinelube.vercel.app'    // vercel frontend
   ],
   credentials: true,
 }));
