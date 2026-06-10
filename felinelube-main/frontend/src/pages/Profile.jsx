@@ -205,7 +205,19 @@ export default function Profile() {
                   <label>Mobile Number</label>
                   <div className="auth-input-wrapper">
                     <HiOutlinePhone className="auth-input-icon" />
-                    <input type="text" className="auth-input" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+60 19-876 5432" />
+                    <input 
+                      type="text" 
+                      className="auth-input" 
+                      value={formData.phone || ''} 
+                      onChange={e => {
+                        let val = e.target.value;
+                        // Keep only digits, spaces, hyphens, and a leading '+'
+                        val = val.replace(/(?!^\+)[^\d\s\-]/g, '');
+                        setFormData({...formData, phone: val});
+                      }} 
+                      maxLength={15} 
+                      placeholder="+60 19-876 5432" 
+                    />
                   </div>
                 </div>
 
