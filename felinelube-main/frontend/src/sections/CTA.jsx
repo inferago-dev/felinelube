@@ -17,6 +17,7 @@ export default function CTA({ setView }) {
   return (
     <section className="cta" id="final-cta">
       <div className="cta__bg" />
+      <div className="cta__grid-overlay" />
       <motion.div 
         className="cta__glow"
         animate={{ 

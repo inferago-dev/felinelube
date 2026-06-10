@@ -13,9 +13,20 @@
 .cta__bg {
   position: absolute;
   inset: 0;
-  background: 
-    radial-gradient(circle at 50% 50%, rgba(212, 160, 23, 0.1) 0%, transparent 70%),
-    linear-gradient(180deg, var(--color-bg) 0%, var(--color-surface) 50%, var(--color-bg) 100%);
+  background:
+    radial-gradient(circle at 50% 50%, rgba(212, 160, 23, 0.12) 0%, transparent 65%),
+    linear-gradient(180deg, var(--color-bg) 0%, var(--color-bg-alt) 50%, var(--color-bg) 100%);
+}
+
+.cta__grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(212, 160, 23, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 160, 23, 0.025) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse 85% 65% at 50% 50%, black 0%, transparent 80%);
+  pointer-events: none;
 }
 
 .cta__glow {
@@ -23,46 +34,59 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(212, 160, 23, 0.15) 0%, transparent 70%);
-  filter: blur(80px);
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(212, 160, 23, 0.14) 0%, transparent 65%);
+  filter: blur(100px);
   pointer-events: none;
 }
 
 .cta__container {
   position: relative;
   z-index: 10;
-  max-width: 900px;
+  max-width: 860px;
   margin: 0 auto;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.75rem;
 }
 
 .cta__heading {
-  font-size: clamp(2.4rem, 5vw, 4.5rem);
-  font-weight: 900;
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(2.4rem, 5.5vw, 4.8rem);
+  font-weight: 700;
   color: var(--color-text);
-  line-height: 1.1;
-  letter-spacing: -0.04em;
+  line-height: 1.08;
+  letter-spacing: 0.03em;
   text-transform: uppercase;
 }
 
+.cta__heading .gold-text {
+  background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
+
 .cta__subtext {
-  font-size: 1.15rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
   color: var(--color-text-dim);
-  max-width: 600px;
-  line-height: 1.7;
+  max-width: 580px;
+  line-height: 1.8;
+  font-weight: 400;
 }
 
 .cta__actions {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  margin-top: 1rem;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 @media (max-width: 600px) {
