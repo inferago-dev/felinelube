@@ -13,11 +13,10 @@ app.use(helmet());
 app.use(xss());
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow any localhost, 127.0.0.1, or 192.168.* for local dev
-    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('192.168.') || origin === 'https://felinelube.onrender.com' || origin === 'https://felinelube.vercel.app') {
+    if (!origin || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('192.168.') || origin.includes('felinelube.onrender.com') || origin.includes('felinelube.vercel.app')) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
   credentials: true,
