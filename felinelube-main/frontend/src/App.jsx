@@ -17,6 +17,7 @@ import ContactPage from './sections/ContactPage'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Profile from './pages/Profile'
+import Checkout from './pages/Checkout'
 
 /* Admin Components */
 import AdminLayout from './layouts/AdminLayout'
@@ -59,7 +60,7 @@ function PublicLayout() {
   }
 
   // Hide CTA, Contact, and Footer in clean layouts
-  const isShopOrAuth = path === '/shop' || path === '/login' || path === '/signup' || path === '/profile' || path.startsWith('/product')
+  const isShopOrAuth = path === '/shop' || path === '/login' || path === '/signup' || path === '/profile' || path === '/checkout' || path.startsWith('/product')
 
   return (
     <div className="app">
@@ -83,6 +84,7 @@ function PublicLayout() {
           <Route path="/login" element={<Login setView={setView} />} />
           <Route path="/signup" element={<Signup setView={setView} />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/checkout" element={<Checkout />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

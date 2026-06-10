@@ -1,10 +1,12 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { HiX, HiOutlineTrash, HiOutlineShoppingCart } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import OilCan from './OilCan';
 import './CartDrawer.css';
 
 export default function CartDrawer() {
+  const navigate = useNavigate();
   const { isCartOpen, toggleCart, cartItems, updateQuantity, removeFromCart, cartTotal, cartCount } = useCart();
 
   const shippingCost = cartTotal > 100 ? 0 : 15;
@@ -88,7 +90,15 @@ export default function CartDrawer() {
                   <span>Total</span>
                   <span>RM {finalTotal.toFixed(2)}</span>
                 </div>
-                <button className="btn btn-primary cart-checkout-btn">Proceed to Checkout</button>
+                <button 
+                  className="btn btn-primary cart-checkout-btn"
+                  onClick={() => {
+                    toggleCart();
+                    navigate('/checkout');
+                  }}
+                >
+                  Proceed to Checkout
+                </button>
               </div>
             )}
           </motion.div>

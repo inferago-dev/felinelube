@@ -68,6 +68,7 @@ exports.createOrder = async (req, res) => {
             productId: item.productId,
             quantity: parseInt(item.quantity, 10),
             price: parseFloat(item.price),
+            variantSize: typeof item.variantSize === 'string' ? item.variantSize : 'Base',
           })),
         },
       },
