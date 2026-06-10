@@ -14,6 +14,12 @@ export const products = [
       { label: 'Viscosity Grade', value: '5W-40' },
       { label: 'API Standard', value: 'SP / SN PLUS' },
       { label: 'Base Oil', value: 'Group IV PAO' }
+    ],
+    variants: [
+      { size: '1L', price: 55.00, stock: 50 },
+      { size: '4L', price: 185.00, stock: 120 },
+      { size: '18L', price: 780.00, stock: 5 },
+      { size: '209L', price: 8500.00, stock: 2 }
     ]
   },
   {
@@ -31,6 +37,12 @@ export const products = [
       { label: 'Viscosity Grade', value: '10W-40' },
       { label: 'API Standard', value: 'SN / CF' },
       { label: 'Base Oil', value: 'Synthetic Blend' }
+    ],
+    variants: [
+      { size: '1L', price: 38.00, stock: 40 },
+      { size: '4L', price: 125.00, stock: 85 },
+      { size: '18L', price: 520.00, stock: 10 },
+      { size: '209L', price: 5800.00, stock: 0 }
     ]
   },
   {
@@ -48,6 +60,12 @@ export const products = [
       { label: 'Viscosity Grade', value: '15W-40' },
       { label: 'API Standard', value: 'SL / CF' },
       { label: 'Base Oil', value: 'Premium Mineral' }
+    ],
+    variants: [
+      { size: '1L', price: 25.00, stock: 100 },
+      { size: '4L', price: 85.00, stock: 150 },
+      { size: '18L', price: 350.00, stock: 20 },
+      { size: '209L', price: 3900.00, stock: 5 }
     ]
   },
   {
@@ -65,6 +83,12 @@ export const products = [
       { label: 'Viscosity Grade', value: '15W-40' },
       { label: 'API Standard', value: 'CK-4 / SN' },
       { label: 'Base Oil', value: 'Fully Synthetic' }
+    ],
+    variants: [
+      { size: '1L', price: 65.00, stock: 30 },
+      { size: '4L', price: 240.00, stock: 60 },
+      { size: '18L', price: 950.00, stock: 15 },
+      { size: '209L', price: 10500.00, stock: 3 }
     ]
   },
   {
@@ -82,6 +106,12 @@ export const products = [
       { label: 'Viscosity Grade', value: '80W-90' },
       { label: 'API Standard', value: 'GL-5' },
       { label: 'Type', value: 'EP Lubricant' }
+    ],
+    variants: [
+      { size: '1L', price: 45.00, stock: 80 },
+      { size: '4L', price: 160.00, stock: 45 },
+      { size: '18L', price: 650.00, stock: 8 },
+      { size: '209L', price: 7200.00, stock: 1 }
     ]
   },
   {
@@ -99,6 +129,12 @@ export const products = [
       { label: 'Viscosity Grade', value: '10W-40' },
       { label: 'API Standard', value: 'SN / JASO MA2' },
       { label: 'Base Oil', value: 'Fully Synthetic' }
+    ],
+    variants: [
+      { size: '1L', price: 35.00, stock: 200 },
+      { size: '4L', price: 130.00, stock: 120 },
+      { size: '18L', price: 500.00, stock: 0 },
+      { size: '209L', price: 5500.00, stock: 0 }
     ]
   }
 ];
