@@ -31,6 +31,7 @@ import AdminHomepage from './pages/AdminHomepage'
 import AdminSettings from './pages/AdminSettings'
 import AdminNotifications from './pages/AdminNotifications'
 import AdminProfile from './pages/AdminProfile'
+import AdminPlaceholder from './pages/AdminPlaceholder'
 
 // Scroll To Top on Route Navigation
 function ScrollToTop() {
