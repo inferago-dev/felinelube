@@ -90,7 +90,11 @@ export default function AdminLayout({ children }) {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-            <div style={{ position: 'relative', cursor: 'pointer' }}>
+            <div 
+              style={{ position: 'relative', cursor: 'pointer' }}
+              onClick={() => navigate('/admin/notifications')}
+              title="View Notifications"
+            >
               <HiOutlineBell style={{ fontSize: '1.4rem', color: 'var(--admin-text-dim)' }} />
               <span style={{ 
                 position: 'absolute', 
@@ -104,7 +108,11 @@ export default function AdminLayout({ children }) {
               }} />
             </div>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', borderLeft: '1px solid var(--admin-border)', paddingLeft: '1.5rem' }}>
+            <div 
+              style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', borderLeft: '1px solid var(--admin-border)', paddingLeft: '1.5rem', cursor: 'pointer' }}
+              onClick={() => navigate('/admin/profile')}
+              title="View Profile"
+            >
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontSize: '0.85rem', fontWeight: '600' }}>Admin User</div>
                 <div style={{ fontSize: '0.7rem', color: 'var(--admin-text-dim)' }}>Super Admin</div>

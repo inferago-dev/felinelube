@@ -4,6 +4,7 @@ const helmet = require('helmet');
 const xss = require('xss');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
+const path = require('path');
 
 dotenv.config();
 
@@ -56,7 +57,6 @@ app.use(cors({
   },
   credentials: true,
 }));
-
 // ----------------------------------------------------------
 // XSS: sanitize all string values in request body
 // ----------------------------------------------------------
@@ -108,20 +108,24 @@ app.use('/api/auth/', authLimiter);
 // ----------------------------------------------------------
 // Static uploads directory
 // ----------------------------------------------------------
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ----------------------------------------------------------
 // Routes
 // ----------------------------------------------------------
-const productRoutes = require('./routes/productRoutes');
-const orderRoutes = require('./routes/orderRoutes');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+const homepageRoutes = require('./routes/homepageRoutes');
+const settingRoutes = require('./routes/settingRoutes');
 
-app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/homepage', homepageRoutes);
+app.use('/api/settings', settingRoutes);
 
 // ----------------------------------------------------------
 // Health check (no sensitive info exposed)

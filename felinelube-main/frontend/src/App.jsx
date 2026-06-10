@@ -25,7 +25,11 @@ import AdminProducts from './pages/AdminProducts'
 import AdminOrders from './pages/AdminOrders'
 import AdminLogin from './pages/AdminLogin'
 import ProtectedRoute from './components/ProtectedRoute'
-import AdminPlaceholder from './pages/AdminPlaceholder'
+import AdminCustomers from './pages/AdminCustomers'
+import AdminHomepage from './pages/AdminHomepage'
+import AdminSettings from './pages/AdminSettings'
+import AdminNotifications from './pages/AdminNotifications'
+import AdminProfile from './pages/AdminProfile'
 
 // Scroll To Top on Route Navigation
 function ScrollToTop() {
@@ -144,10 +148,12 @@ function AdminRoutes() {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="products" element={<AdminProducts />} />
         <Route path="orders" element={<AdminOrders />} />
-        <Route path="customers" element={<AdminPlaceholder title="Customers Management" />} />
+        <Route path="customers" element={<AdminCustomers />} />
         <Route path="analytics" element={<AdminPlaceholder title="Analytics & Reports" />} />
-        <Route path="homepage" element={<AdminPlaceholder title="Homepage Controls" />} />
-        <Route path="settings" element={<AdminPlaceholder title="System Settings" />} />
+        <Route path="homepage" element={<AdminHomepage />} />
+        <Route path="settings" element={<AdminSettings />} />
+        <Route path="notifications" element={<AdminNotifications />} />
+        <Route path="profile" element={<AdminProfile />} />
         <Route path="*" element={<Navigate to="dashboard" replace />} />
       </Routes>
     </AdminLayout>

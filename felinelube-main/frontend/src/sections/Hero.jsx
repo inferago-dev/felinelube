@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { HiArrowRight, HiPlay } from 'react-icons/hi'
 import { useLanguage } from '../context/LanguageContext'
+import API_BASE from '../api'
 import './Hero.css'
 
 const fadeUp = {
@@ -29,6 +31,21 @@ const glowPulse = {
 
 export default function Hero({ setView }) {
   const { t } = useLanguage()
+  const [dynTitle, setDynTitle] = useState('')
+  const [dynSubtitle, setDynSubtitle] = useState('')
+
+  useEffect(() => {
+    fetch(`${API_BASE}/homepage/public`)
+      .then(res => res.json())
+      .then(data => {
+        const heroData = data.find(d => d.section === 'Hero')
+        if (heroData && heroData.content) {
+          if (heroData.content.title) setDynTitle(heroData.content.title)
+          if (heroData.content.subtitle) setDynSubtitle(heroData.content.subtitle)
+        }
+      })
+      .catch(console.error)
+  }, [])
   
   const scrollTo = (id) => {
     document.querySelector(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -62,12 +79,16 @@ export default function Hero({ setView }) {
           </motion.div>
 
           <motion.h1 className="hero__heading" custom={1} variants={fadeUp} initial="hidden" animate="visible">
-            {t('hero.title')}
-            <span className="hero__heading-highlight">{t('hero.titleGold')}</span>
+            {dynTitle ? dynTitle : (
+              <>
+                {t('hero.title')}
+                <span className="hero__heading-highlight">{t('hero.titleGold')}</span>
+              </>
+            )}
           </motion.h1>
 
           <motion.p className="hero__subtext" custom={2} variants={fadeUp} initial="hidden" animate="visible">
-            {t('hero.desc')}
+            {dynSubtitle || t('hero.desc')}
           </motion.p>
 
           <motion.div className="hero__actions" custom={3} variants={fadeUp} initial="hidden" animate="visible">

@@ -83,7 +83,7 @@ exports.adminGetProducts = async (req, res) => {
 // ---------------------------------------------------------------
 exports.createProduct = async (req, res) => {
   try {
-    const { name, slug, description, shortDesc, category, apiRating, viscosity, price, stock, isFeatured, features, specs } = req.body;
+    const { name, slug, description, shortDesc, category, apiRating, viscosity, price, stock, isFeatured, features, specs, variants, restockDate } = req.body;
 
     // Validate required fields
     if (!name || !slug) {
@@ -107,6 +107,14 @@ exports.createProduct = async (req, res) => {
 
     // Safely parse specs — never crash server on bad JSON
     const parsedSpecs = safeJsonParse(specs, {});
+    const parsedVariants = safeJsonParse(variants, null);
+    
+    let imageUrl = null;
+    let pdfUrlStr = null;
+    if (req.files) {
+      if (req.files.image) imageUrl = `/${req.files.image[0].path.replace(/\\/g, '/')}`;
+      if (req.files.pdf) pdfUrlStr = `/${req.files.pdf[0].path.replace(/\\/g, '/')}`;
+    }
 
     const product = await prisma.product.create({
       data: {
@@ -120,9 +128,13 @@ exports.createProduct = async (req, res) => {
         price: parsedPrice,
         stock: parsedStock,
         isFeatured: isFeatured === 'true' || isFeatured === true,
-        features: Array.isArray(features) ? features.slice(0, 20) : [],
+        features: Array.isArray(features) ? features.slice(0, 20) : (typeof features === 'string' ? safeJsonParse(features, []) : []),
         specs: parsedSpecs,
-      },
+        variants: parsedVariants,
+        image: imageUrl,
+        pdfUrl: pdfUrlStr,
+        restockDate: restockDate ? new Date(restockDate) : null
+      }
     });
 
     return res.status(201).json(product);
@@ -140,11 +152,11 @@ exports.createProduct = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-
+    
     // Whitelist only the fields that are allowed to be updated
     const {
       name, description, shortDesc, category, apiRating,
-      viscosity, price, stock, isFeatured, features, specs, status
+      viscosity, price, stock, isFeatured, features, specs, status, variants, restockDate
     } = req.body;
 
     const updateData = {};
@@ -171,15 +183,28 @@ exports.updateProduct = async (req, res) => {
     }
     if (Array.isArray(features)) {
       updateData.features = features.slice(0, 20);
+    } else if (typeof features === 'string') {
+      updateData.features = safeJsonParse(features, []);
     }
     if (specs !== undefined) {
       updateData.specs = safeJsonParse(specs, {});
+    }
+    if (variants !== undefined) {
+      updateData.variants = safeJsonParse(variants, null);
+    }
+    if (restockDate !== undefined) {
+      updateData.restockDate = restockDate ? new Date(restockDate) : null;
     }
     if (status !== undefined) {
       if (!ALLOWED_PRODUCT_STATUSES.includes(status)) {
         return res.status(400).json({ message: 'Invalid status value' });
       }
       updateData.status = status;
+    }
+
+    if (req.files) {
+      if (req.files.image) updateData.image = `/${req.files.image[0].path.replace(/\\/g, '/')}`;
+      if (req.files.pdf) updateData.pdfUrl = `/${req.files.pdf[0].path.replace(/\\/g, '/')}`;
     }
 
     const product = await prisma.product.update({

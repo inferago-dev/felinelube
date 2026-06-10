@@ -56,11 +56,14 @@ model Product {
   status          String         @default("ACTIVE") // ACTIVE, SOLD_OUT, DRAFT, HIDDEN
   isFeatured      Boolean        @default(false)
   specs           Json?          // Technical specifications
+  variants        Json?          // Array of {size, price, stock}
   features        String[]
   seoTitle        String?
   seoDesc         String?
+  image           String?        // Main image upload URL
   images          ProductImage[]
   pdfUrl          String?
+  restockDate     DateTime?      // Expected restock date if out of stock
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   orderItems      OrderItem[]

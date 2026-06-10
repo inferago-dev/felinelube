@@ -99,14 +99,29 @@ const ProductDetails = () => {
               >
                 {selectedVariant.stock === 0 ? 'Out of Stock' : t('products.addToCart')} <HiShoppingCart />
               </button>
-              <button className="btn btn-secondary">{t('products.buyNow')}</button>
+              
+              {productData.pdfUrl ? (
+                <a href={`http://localhost:5000${productData.pdfUrl}`} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+                  Datasheet PDF
+                </a>
+              ) : (
+                <button className="btn btn-secondary">{t('products.buyNow')}</button>
+              )}
             </div>
             
-            <div className="about__highlight" style={{ fontSize: '0.8rem' }}>
-              <HiCheckCircle style={{ color: selectedVariant.stock > 0 ? '#25D366' : '#FF4D4D' }} /> 
-              {selectedVariant.stock > 10 ? (lang === 'en' ? 'In Stock' : 'Ada Stok') : 
-               selectedVariant.stock > 0 ? `Low Stock (${selectedVariant.stock} left)` : 
-               'Out of Stock'} — {lang === 'en' ? 'Free Shipping in Malaysia' : 'Penghantaran Percuma di Malaysia'}
+            <div className="about__highlight" style={{ fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div>
+                <HiCheckCircle style={{ color: selectedVariant.stock > 0 ? '#25D366' : '#FF4D4D' }} /> 
+                {selectedVariant.stock > 10 ? (lang === 'en' ? ' In Stock' : ' Ada Stok') : 
+                 selectedVariant.stock > 0 ? ` Low Stock (${selectedVariant.stock} left)` : 
+                 ' Out of Stock'} — {lang === 'en' ? 'Free Shipping in Malaysia' : 'Penghantaran Percuma di Malaysia'}
+              </div>
+              
+              {selectedVariant.stock === 0 && productData.restockDate && (
+                <div style={{ color: 'var(--color-gold)', fontWeight: 'bold' }}>
+                  Expected Restock: {new Date(productData.restockDate).toLocaleDateString()}
+                </div>
+              )}
             </div>
           </div>
         </motion.div>

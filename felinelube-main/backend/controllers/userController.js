@@ -77,8 +77,51 @@ const getUserNotifications = async (req, res) => {
   }
 };
 
+// @desc    Get all users for admin
+// @route   GET /api/users/admin/all
+// @access  Private (Admin)
+const adminGetUsers = async (req, res) => {
+  try {
+    const users = await prisma.user.findMany({
+      include: {
+        _count: {
+          select: { orders: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update user status (ban/suspend/activate)
+// @route   PUT /api/users/admin/:id/status
+// @access  Private (Admin)
+const adminUpdateUserStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, banReason } = req.body; // status: ACTIVE, BANNED, SUSPENDED
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        status,
+        banReason: status === 'BANNED' || status === 'SUSPENDED' ? banReason : null
+      }
+    });
+
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
-  getUserNotifications
+  getUserNotifications,
+  adminGetUsers,
+  adminUpdateUserStatus
 };
