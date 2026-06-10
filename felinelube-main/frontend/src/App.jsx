@@ -55,7 +55,7 @@ function PublicLayout() {
   }
 
   // Hide CTA, Contact, and Footer in clean layouts
-  const isShopOrAuth = path === '/shop' || path === '/login' || path === '/signup' || path.startsWith('/product')
+  const isShopOrAuth = path === '/shop' || path === '/login' || path === '/signup' || path === '/profile' || path.startsWith('/product')
 
   return (
     <div className="app">

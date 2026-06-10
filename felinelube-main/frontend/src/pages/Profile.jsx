@@ -59,6 +59,11 @@ export default function Profile() {
           } else {
             setNotifications([{ id: 'dummy1', title: 'Welcome to Feline Lube!', message: 'Thanks for joining. Keep an eye out for exclusive offers.', createdAt: new Date().toISOString() }]);
           }
+        } else if ([401, 403, 404].includes(profileRes.status)) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/login');
+          return;
         }
 
         // Fetch Orders
