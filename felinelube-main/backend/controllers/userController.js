@@ -37,6 +37,14 @@ const updateUserProfile = async (req, res) => {
   try {
     const { name, phone, address } = req.body;
 
+    if (phone) {
+      const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+      const myPhoneRegex = /^(?:\+60|60|0)1[0-9]{8,9}$/;
+      if (!myPhoneRegex.test(cleanPhone)) {
+        return res.status(400).json({ message: 'Invalid Malaysia phone number format' });
+      }
+    }
+
     // Optional: password update could go here, but usually requires separate logic for security
     // We will just do basic profile info here.
 

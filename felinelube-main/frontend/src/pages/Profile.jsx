@@ -96,6 +96,16 @@ export default function Profile() {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     setUpdateMsg('');
+
+    if (formData.phone) {
+      const cleanPhone = formData.phone.replace(/[\s\-\(\)]/g, '');
+      const myPhoneRegex = /^(?:\+60|60|0)1[0-9]{8,9}$/;
+      if (!myPhoneRegex.test(cleanPhone)) {
+        setUpdateMsg('Error: Please enter a valid Malaysia phone number (e.g. +60 19-876 5432).');
+        return;
+      }
+    }
+
     try {
       const res = await fetch(`${API_BASE}/users/profile`, {
         method: 'PUT',
@@ -113,7 +123,8 @@ export default function Profile() {
         setUpdateMsg('Profile updated successfully!');
         setTimeout(() => setUpdateMsg(''), 3000);
       } else {
-        setUpdateMsg('Failed to update profile.');
+        const errData = await res.json();
+        setUpdateMsg(errData.message || 'Failed to update profile.');
       }
     } catch (err) {
       setUpdateMsg('Error updating profile.');
@@ -194,7 +205,7 @@ export default function Profile() {
                   <label>Mobile Number</label>
                   <div className="auth-input-wrapper">
                     <HiOutlinePhone className="auth-input-icon" />
-                    <input type="text" className="auth-input" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+60 12 345 6789" />
+                    <input type="text" className="auth-input" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} placeholder="+60 19-876 5432" />
                   </div>
                 </div>
 
