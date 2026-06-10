@@ -5,7 +5,7 @@ import { HiSearch, HiFilter, HiShoppingCart, HiArrowRight, HiChevronDown, HiRefr
 import { useLanguage } from '../context/LanguageContext'
 import { useCart } from '../context/CartContext'
 import OilCan from '../components/OilCan'
-import API_BASE from '../api'
+import API_BASE, { SERVER_BASE } from '../api'
 import '../styles/Shop.css'
 
 const categories = ['All', 'Fully Synthetic', 'Semi Synthetic', 'Mineral', 'Heavy Duty', 'Industrial', 'Motorcycle']
@@ -161,7 +161,11 @@ export default function Shop() {
                     >
                       <div className="product-card__visual">
                         <div className="product-card__can">
-                          <OilCan {...getOilCanProps(product)} />
+                          {product.image ? (
+                            <img src={`${SERVER_BASE}${product.image}`} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'contain' }} />
+                          ) : (
+                            <OilCan {...getOilCanProps(product)} />
+                          )}
                         </div>
                         <div className="product-card__grade">{product.category}</div>
                       </div>

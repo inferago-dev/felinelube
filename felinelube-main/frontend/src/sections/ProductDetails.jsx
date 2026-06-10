@@ -1,38 +1,54 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { HiShoppingCart, HiCheckCircle } from 'react-icons/hi'
 import { TbShieldCheck, TbFlame, TbDroplet, TbBolt, TbTruck, TbClock } from 'react-icons/tb'
-import { products } from '../data/productData'
 import { useLanguage } from '../context/LanguageContext'
 import { useCart } from '../context/CartContext'
 import OilCan from '../components/OilCan'
+import API_BASE, { SERVER_BASE } from '../api'
 import '../styles/ProductDetails.css'
 import FeaturedProducts from './FeaturedProducts'
 
 const ProductDetails = () => {
   const { slug } = useParams()
+  const navigate = useNavigate()
   const { t, lang } = useLanguage()
   const { addToCart } = useCart()
   const [qty, setQty] = useState(1)
-  
-  // Find dynamic product by slug or id
-  const productData = products.find(p => {
-    const pSlug = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
-    return pSlug === slug || p.id.toString() === slug
-  }) || products[0]
-
+  const [productData, setProductData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [selectedPkg, setSelectedPkg] = useState('4L')
-  
-  // When product changes, reset to 4L if it exists, else first variant
-  useEffect(() => {
-    if (productData.variants) {
-      const has4L = productData.variants.some(v => v.size === '4L')
-      setSelectedPkg(has4L ? '4L' : productData.variants[0].size)
-    }
-  }, [productData])
 
-  const selectedVariant = productData.variants?.find(v => v.size === selectedPkg) || { size: '4L', price: productData.price, stock: 100 }
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true)
+        const res = await fetch(`${API_BASE}/products/${slug}`)
+        if (!res.ok) {
+          throw new Error('Product not found')
+        }
+        const data = await res.json()
+        setProductData(data)
+        
+        // Setup initial selected package based on fetched variants
+        if (data.variants && data.variants.length > 0) {
+          const has4L = data.variants.some(v => v.size === '4L')
+          setSelectedPkg(has4L ? '4L' : data.variants[0].size)
+        } else {
+          setSelectedPkg('Base') // fallback if no variants
+        }
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchProduct()
+  }, [slug])
+
+  const selectedVariant = productData?.variants?.find(v => v.size === selectedPkg) || { size: 'Base', price: productData?.price || 0, stock: productData?.stock || 0 }
 
   const benefits = [
     { icon: <TbShieldCheck />, title: t('why.f1.title'), desc: t('why.f1.desc') },
@@ -44,7 +60,21 @@ const ProductDetails = () => {
   ]
 
   const handleAddToCart = () => {
+    if (!productData) return;
     addToCart(productData, selectedVariant, qty);
+  }
+
+  if (loading) {
+    return <div style={{ paddingTop: '100px', minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Loading product details...</div>
+  }
+
+  if (error || !productData) {
+    return (
+      <div style={{ paddingTop: '100px', minHeight: '60vh', textAlign: 'center' }}>
+        <h2>Product not found</h2>
+        <button className="btn btn-secondary" onClick={() => navigate('/shop')} style={{ marginTop: '1rem' }}>Back to Shop</button>
+      </div>
+    )
   }
 
   return (
@@ -58,12 +88,20 @@ const ProductDetails = () => {
           transition={{ duration: 0.8 }}
         >
           <div className="prod-gallery__main">
-            <OilCan label={productData.imageLabel} viscosity={productData.viscosity} color={productData.color} size={320} />
+            {productData.image ? (
+              <img src={`${SERVER_BASE}${productData.image}`} alt={productData.name} style={{ width: '100%', maxWidth: '400px', objectFit: 'contain' }} />
+            ) : (
+              <OilCan label="FELINE" viscosity={productData.viscosity} color="#D4A017" size={320} />
+            )}
           </div>
           <div className="prod-gallery__thumbs">
             {[1, 2, 3].map(i => (
               <div key={i} className={`prod-gallery__thumb ${i === 1 ? 'active' : ''}`}>
-                <OilCan label={productData.imageLabel} viscosity={productData.viscosity} color={productData.color} size={60} />
+                {productData.image ? (
+                  <img src={`${SERVER_BASE}${productData.image}`} alt={productData.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <OilCan label="FELINE" viscosity={productData.viscosity} color="#D4A017" size={60} />
+                )}
               </div>
             ))}
           </div>
@@ -101,7 +139,7 @@ const ProductDetails = () => {
               </button>
               
               {productData.pdfUrl ? (
-                <a href={`http://localhost:5000${productData.pdfUrl}`} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
+                <a href={`${SERVER_BASE}${productData.pdfUrl}`} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ textDecoration: 'none' }}>
                   Datasheet PDF
                 </a>
               ) : (
@@ -128,24 +166,26 @@ const ProductDetails = () => {
       </section>
 
       {/* 3. Specs Table */}
-      <section className="prod-specs">
-        <div className="section-label" style={{ justifyContent: 'center' }}>Engineering</div>
-        <h2 className="section-title" style={{ textAlign: 'center' }}>{t('products.specs')}</h2>
-        
-        <motion.div 
-          className="specs-table"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          {productData.specs.map(spec => (
-            <div key={spec.label} className="specs-row">
-              <span className="specs-label">{spec.label}</span>
-              <span className="specs-value">{spec.value}</span>
-            </div>
-          ))}
-        </motion.div>
-      </section>
+      {productData.specs && Array.isArray(productData.specs) && productData.specs.length > 0 && (
+        <section className="prod-specs">
+          <div className="section-label" style={{ justifyContent: 'center' }}>Engineering</div>
+          <h2 className="section-title" style={{ textAlign: 'center' }}>{t('products.specs')}</h2>
+          
+          <motion.div 
+            className="specs-table"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            {productData.specs.map(spec => (
+              <div key={spec.label} className="specs-row">
+                <span className="specs-label">{spec.label}</span>
+                <span className="specs-value">{spec.value}</span>
+              </div>
+            ))}
+          </motion.div>
+        </section>
+      )}
 
       {/* 4. Performance Benefits */}
       <section className="why">

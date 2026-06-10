@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiOutlinePlus, HiOutlinePencilAlt, HiOutlineTrash, HiOutlineEyeOff, HiOutlineStar, HiRefresh, HiX, HiSearch, HiFilter } from 'react-icons/hi'
-import API_BASE, { adminAuthHeaders } from '../api'
+import API_BASE, { adminAuthHeaders, SERVER_BASE } from '../api'
 import '../styles/Admin.css'
 
 const categories = ['Engine Oils', 'Gear Oils', 'Hydraulic Oils', 'Bulk Oils'];
@@ -289,7 +289,7 @@ export default function AdminProducts() {
                     <tr key={prod.id}>
                       <td>
                         {prod.image ? (
-                          <img src={`http://localhost:5000${prod.image}`} alt={prod.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
+                          <img src={`${SERVER_BASE}${prod.image}`} alt={prod.name} style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }} />
                         ) : (
                           <div style={{ width: '40px', height: '40px', background: '#1a1a1a', borderRadius: '4px', border: '1px solid var(--admin-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', color: 'var(--color-gold)' }}>
                             {prod.viscosity}

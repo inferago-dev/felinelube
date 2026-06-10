@@ -1,26 +1,28 @@
 // Central API configuration
 // Automatically switches between local dev and production
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.startsWith('192.168');
-const API_BASE = isLocal
-  ? `http://${window.location.hostname}:5000/api`
-  : 'https://felinelube.onrender.com/api'
+export const SERVER_BASE = isLocal
+  ? `http://${window.location.hostname}:5000`
+  : 'https://felinelube.onrender.com'
+  
+const API_BASE = `${SERVER_BASE}/api`
 
 export default API_BASE
 
 // Helper: get auth headers for regular user
-export const authHeaders = () => {
+export const authHeaders = (isFormData = false) => {
   const token = localStorage.getItem('token')
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  }
+  const headers = {}
+  if (!isFormData) headers['Content-Type'] = 'application/json'
+  if (token) headers['Authorization'] = `Bearer ${token}`
+  return headers
 }
 
 // Helper: get auth headers for admin
-export const adminAuthHeaders = () => {
+export const adminAuthHeaders = (isFormData = false) => {
   const token = localStorage.getItem('adminToken')
-  return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  }
+  const headers = {}
+  if (!isFormData) headers['Content-Type'] = 'application/json'
+  if (token) headers['Authorization'] = `Bearer ${token}`
+  return headers
 }
