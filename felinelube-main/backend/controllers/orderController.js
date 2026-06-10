@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 // @route   POST /api/orders
 exports.createOrder = async (req, res) => {
   try {
-    const { customerName, customerPhone, address, totalAmount, items, paymentMethod } = req.body;
+    const { customerName, customerPhone, address, totalAmount, items, paymentMethod, userId } = req.body;
     
     // Generate simple order number
     const orderNumber = 'FEL-' + Math.random().toString(36).substring(2, 9).toUpperCase();
@@ -18,6 +18,7 @@ exports.createOrder = async (req, res) => {
         address,
         totalAmount: parseFloat(totalAmount),
         paymentMethod,
+        userId: userId || null,
         items: {
           create: items.map(item => ({
             productId: item.productId,
@@ -36,7 +37,7 @@ exports.createOrder = async (req, res) => {
 };
 
 // @desc    Get all orders (Admin)
-// @route   GET /api/admin/orders
+// @route   GET /api/orders/admin/all
 exports.getOrders = async (req, res) => {
   try {
     const orders = await prisma.order.findMany({
@@ -50,7 +51,7 @@ exports.getOrders = async (req, res) => {
 };
 
 // @desc    Update Order Status (Admin)
-// @route   PUT /api/admin/orders/:id
+// @route   PUT /api/orders/admin/:id
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -61,5 +62,21 @@ exports.updateOrderStatus = async (req, res) => {
     res.json(order);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+// @desc    Get logged in user orders
+// @route   GET /api/orders/myorders
+// @access  Private (User)
+exports.getMyOrders = async (req, res) => {
+  try {
+    const orders = await prisma.order.findMany({
+      where: { userId: req.user.id },
+      include: { items: { include: { product: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

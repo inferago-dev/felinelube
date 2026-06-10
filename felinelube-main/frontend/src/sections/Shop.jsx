@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiSearch, HiFilter, HiShoppingCart, HiArrowRight, HiChevronDown, HiRefresh } from 'react-icons/hi'
 import { useLanguage } from '../context/LanguageContext'
+import { useCart } from '../context/CartContext'
 import OilCan from '../components/OilCan'
 import API_BASE from '../api'
 import '../styles/Shop.css'
@@ -12,6 +13,7 @@ const categories = ['All', 'Fully Synthetic', 'Semi Synthetic', 'Mineral', 'Heav
 export default function Shop() {
   const { t, lang } = useLanguage()
   const navigate = useNavigate()
+  const { addToCart } = useCart()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -68,6 +70,13 @@ export default function Shop() {
       viscosity: product.viscosity,
       size: 180
     }
+  }
+
+  const handleQuickAdd = (e, product) => {
+    e.stopPropagation();
+    // Default 4L variant
+    const defaultVariant = { size: '4L', price: product.price, stock: 100 };
+    addToCart(product, defaultVariant, 1);
   }
 
   return (
@@ -163,7 +172,9 @@ export default function Shop() {
                         <div className="product-card__price">RM {product.price.toFixed(2)}</div>
                         
                         <div className="product-card__actions">
-                          <button className="btn-cart" onClick={(e) => e.stopPropagation()}><HiShoppingCart /> {t('products.addToCart')}</button>
+                          <button className="btn-cart" onClick={(e) => handleQuickAdd(e, product)}>
+                            <HiShoppingCart /> {t('products.addToCart')}
+                          </button>
                           <button className="btn-details" onClick={(e) => {
                             e.stopPropagation()
                             navigate(`/product/${productSlug}`)

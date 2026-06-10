@@ -107,10 +107,14 @@ function AdminHiddenShortcut() {
   )
 }
 
+import { CartProvider } from './context/CartContext'
+import CartDrawer from './components/CartDrawer'
+
 function App() {
   return (
-    <>
+    <CartProvider>
       <ScrollToTop />
+      <CartDrawer />
       <Routes>
         {/* Admin Login page */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -128,7 +132,7 @@ function App() {
         {/* Public client routes */}
         <Route path="/*" element={<PublicLayout />} />
       </Routes>
-    </>
+    </CartProvider>
   )
 }
 

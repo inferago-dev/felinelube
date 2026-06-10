@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { HiShoppingCart, HiGlobeAlt, HiMoon, HiSun, HiOutlineUser } from 'react-icons/hi'
 import { useLanguage } from '../context/LanguageContext'
 import { useTheme } from '../context/ThemeContext'
+import { useCart } from '../context/CartContext'
 import './Navbar.css'
 
 export default function Navbar() {
@@ -11,6 +12,7 @@ export default function Navbar() {
   const location = useLocation()
   const { lang, setLang, t } = useLanguage()
   const { theme, toggleTheme } = useTheme()
+  const { cartCount, toggleCart } = useCart()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
@@ -142,9 +144,9 @@ export default function Navbar() {
               </span>
             </li>
 
-            <li className="navbar__icon-link" style={{ cursor: 'pointer' }}>
+            <li className="navbar__icon-link" onClick={toggleCart} style={{ cursor: 'pointer' }}>
               <HiShoppingCart className="navbar__cart-icon" />
-              <span className="navbar__cart-badge">0</span>
+              {cartCount > 0 && <span className="navbar__cart-badge">{cartCount}</span>}
             </li>
 
             <li 
