@@ -1,43 +1,45 @@
 import { motion } from 'framer-motion'
 import { HiArrowRight } from 'react-icons/hi'
 import { TbAtom, TbDroplet, TbEngine, TbGauge, TbTruck } from 'react-icons/tb'
+import { useNavigate } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
 import './Categories.css'
 
 export default function Categories({ setView }) {
   const { t } = useLanguage()
+  const navigate = useNavigate()
 
   const categories = [
     {
-      id: 'fully-synthetic',
+      id: 'Fully Synthetic',
       icon: <TbAtom />,
       tag: 'Premium',
       title: t('categories.cat1.title'),
       desc: t('categories.cat1.desc'),
     },
     {
-      id: 'semi-synthetic',
+      id: 'Semi Synthetic',
       icon: <TbDroplet />,
       tag: 'Value',
       title: t('categories.cat2.title'),
       desc: t('categories.cat2.desc'),
     },
     {
-      id: 'hydraulic-oil',
+      id: 'Industrial',
       icon: <TbGauge />,
       tag: 'Industrial',
       title: t('categories.cat3.title'),
       desc: t('categories.cat3.desc'),
     },
     {
-      id: 'heavy-duty',
+      id: 'Heavy Duty',
       icon: <TbTruck />,
       tag: 'HD Series',
       title: t('categories.cat4.title'),
       desc: t('categories.cat4.desc'),
     },
     {
-      id: 'gear-oil',
+      id: 'All', // Assuming Gear Oil falls under general or all, or map to 'Heavy Duty' if you prefer
       icon: <TbEngine />,
       tag: 'Drivetrain',
       title: t('categories.cat5.title'),
@@ -45,11 +47,9 @@ export default function Categories({ setView }) {
     },
   ]
 
-  const handleExplore = () => {
-    setView('home')
-    setTimeout(() => {
-      document.querySelector('#products')?.scrollIntoView({ behavior: 'smooth' })
-    }, 150)
+  const handleExplore = (categoryId) => {
+    setView('shop')
+    navigate(`/shop?category=${encodeURIComponent(categoryId)}`)
   }
 
   const stagger = {
@@ -88,7 +88,7 @@ export default function Categories({ setView }) {
             key={cat.id} 
             className="cat-card" 
             variants={cardAnim}
-            onClick={handleExplore}
+            onClick={() => handleExplore(cat.id)}
             style={{ cursor: 'pointer' }}
           >
             <div className="cat-card__glow" />

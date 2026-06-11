@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiSearch, HiFilter, HiShoppingCart, HiArrowRight, HiChevronDown, HiRefresh } from 'react-icons/hi'
 import { useLanguage } from '../context/LanguageContext'
@@ -19,7 +19,12 @@ export default function Shop() {
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
-  const [activeCat, setActiveCat] = useState('All')
+  
+  const location = useLocation()
+  const queryParams = new URLSearchParams(location.search)
+  const defaultCat = queryParams.get('category') || 'All'
+  const [activeCat, setActiveCat] = useState(defaultCat)
+  
   const [sortBy, setSortBy] = useState('Newest')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [page, setPage] = useState(1)
