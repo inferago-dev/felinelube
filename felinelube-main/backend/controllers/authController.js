@@ -1,6 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/db');
+const crypto = require('crypto');
+const { sendOTP, sendPasswordReset } = require('../utils/emailService');
 
 // ============================================================
 // SECURITY: JWT_SECRET MUST come from environment variable.
@@ -62,15 +64,23 @@ const registerUser = async (req, res) => {
     // Hash password with cost factor 12 (stronger than default 10)
     const hashedPassword = await bcrypt.hash(password, 12);
 
+    // Generate OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
     const user = await prisma.user.create({
-      data: { name: cleanName, email: cleanEmail, password: hashedPassword },
+      data: { name: cleanName, email: cleanEmail, password: hashedPassword, otp, otpExpiry, isVerified: false },
     });
+
+    await sendOTP(user.email, otp);
 
     return res.status(201).json({
       id: user.id,
       name: user.name,
       email: user.email,
+      isVerified: user.isVerified,
       token: generateToken(user.id),
+      message: 'Registration successful. Please verify your email with the OTP sent.'
     });
   } catch (error) {
     // Never leak internal error details to the client
@@ -109,6 +119,20 @@ const loginUser = async (req, res) => {
 
     if (user.status !== 'ACTIVE') {
       return res.status(403).json({ message: 'Account is suspended' });
+    }
+
+    if (!user.isVerified) {
+      // Regenerate OTP if logging in unverified
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
+      await prisma.user.update({ where: { id: user.id }, data: { otp, otpExpiry } });
+      await sendOTP(user.email, otp);
+      
+      return res.status(403).json({ 
+        message: 'Email not verified. A new OTP has been sent.', 
+        requiresOTP: true, 
+        email: user.email 
+      });
     }
 
     return res.json({
@@ -223,4 +247,138 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, registerAdmin, loginAdmin };
+// ---------------------------------------------------------------
+// @desc    Verify OTP for account activation
+// @route   POST /api/auth/verify-otp
+// @access  Public
+// ---------------------------------------------------------------
+const verifyOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) return res.status(400).json({ message: 'Email and OTP required' });
+
+    const user = await prisma.user.findUnique({ where: { email: sanitizeEmail(email) } });
+    if (!user) return res.status(400).json({ message: 'Invalid request' });
+
+    if (user.isVerified) return res.status(400).json({ message: 'User already verified' });
+    if (user.otp !== otp || new Date() > user.otpExpiry) {
+      return res.status(400).json({ message: 'Invalid or expired OTP' });
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { isVerified: true, otp: null, otpExpiry: null }
+    });
+
+    return res.json({ message: 'Email verified successfully. You can now log in.' });
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    return res.status(500).json({ message: 'Server error during OTP verification' });
+  }
+};
+
+// ---------------------------------------------------------------
+// @desc    Forgot Password - Send Reset Link
+// @route   POST /api/auth/forgot-password
+// @access  Public
+// ---------------------------------------------------------------
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'Please provide an email' });
+
+    const cleanEmail = sanitizeEmail(email);
+    const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
+
+    if (!user) {
+      return res.status(200).json({ message: 'If an account exists, a reset link will be sent.' });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { resetToken, resetTokenExpiry }
+    });
+
+    await sendPasswordReset(user.email, resetToken);
+
+    return res.status(200).json({ message: 'If an account exists, a reset link will be sent.' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// ---------------------------------------------------------------
+// @desc    Reset Password
+// @route   POST /api/auth/reset-password
+// @access  Public
+// ---------------------------------------------------------------
+const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) return res.status(400).json({ message: 'Token and new password required' });
+
+    if (newPassword.length < 8) return res.status(400).json({ message: 'Password must be at least 8 characters' });
+
+    const user = await prisma.user.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: { gt: new Date() }
+      }
+    });
+
+    if (!user) return res.status(400).json({ message: 'Invalid or expired reset token' });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { password: hashedPassword, resetToken: null, resetTokenExpiry: null }
+    });
+
+    return res.status(200).json({ message: 'Password reset successful. You can now log in.' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// ---------------------------------------------------------------
+// @desc    Change Password (Logged In)
+// @route   PUT /api/auth/change-password
+// @access  Private
+// ---------------------------------------------------------------
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    if (!currentPassword || !newPassword) return res.status(400).json({ message: 'Current and new passwords are required' });
+    if (newPassword.length < 8) return res.status(400).json({ message: 'New password must be at least 8 characters' });
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!passwordMatch) return res.status(400).json({ message: 'Incorrect current password' });
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    await prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword }
+    });
+
+    return res.status(200).json({ message: 'Password changed successfully' });
+  } catch (error) {
+    console.error('Change password error:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = { 
+  registerUser, loginUser, registerAdmin, loginAdmin, 
+  verifyOTP, forgotPassword, resetPassword, changePassword 
+};

@@ -20,6 +20,9 @@ export default function Profile() {
   // Settings State
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
   const [updateMsg, setUpdateMsg] = useState('');
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '' });
+  const [passwordMsg, setPasswordMsg] = useState('');
 
   // Orders State
   const [orders, setOrders] = useState([]);
@@ -131,6 +134,31 @@ export default function Profile() {
     }
   };
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    setPasswordMsg('');
+    try {
+      const res = await fetch(`${API_BASE}/auth/change-password`, {
+        method: 'PUT',
+        headers: authHeaders(),
+        body: JSON.stringify(passwordData)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setPasswordMsg('Password changed successfully!');
+        setPasswordData({ currentPassword: '', newPassword: '' });
+        setTimeout(() => {
+          setPasswordMsg('');
+          setShowPasswordChange(false);
+        }, 2000);
+      } else {
+        setPasswordMsg(data.message || 'Error changing password.');
+      }
+    } catch (err) {
+      setPasswordMsg('Server error. Try again.');
+    }
+  };
+
   const removeFromWishlist = (id) => {
     const updated = wishlist.filter(item => item.id !== id);
     setWishlist(updated);
@@ -231,11 +259,37 @@ export default function Profile() {
 
                 <div className="profile-actions">
                   <button type="submit" className="btn btn-primary" style={{ padding: '0.8rem 2rem' }}>Save Changes</button>
-                  <button type="button" className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }}>
+                  <button type="button" className="btn btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.8rem 1.5rem' }} onClick={() => setShowPasswordChange(!showPasswordChange)}>
                     <HiOutlineKey /> Change Password
                   </button>
                 </div>
               </form>
+
+              <AnimatePresence>
+                {showPasswordChange && (
+                  <motion.form 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    style={{ overflow: 'hidden', marginTop: '2rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem' }}
+                    onSubmit={handleChangePassword}
+                  >
+                    <h3 style={{ marginBottom: '1rem' }}>Change Password</h3>
+                    {passwordMsg && <div style={{ marginBottom: '1rem', color: passwordMsg.includes('Error') ? 'var(--color-error)' : 'var(--color-gold)' }}>{passwordMsg}</div>}
+                    <div style={{ display: 'grid', gap: '1.5rem', maxWidth: '400px' }}>
+                      <div className="auth-form-group">
+                        <label>Current Password</label>
+                        <input type="password" required className="auth-input" value={passwordData.currentPassword} onChange={e => setPasswordData({...passwordData, currentPassword: e.target.value})} />
+                      </div>
+                      <div className="auth-form-group">
+                        <label>New Password</label>
+                        <input type="password" required minLength={8} className="auth-input" value={passwordData.newPassword} onChange={e => setPasswordData({...passwordData, newPassword: e.target.value})} />
+                      </div>
+                      <button type="submit" className="btn btn-primary">Update Password</button>
+                    </div>
+                  </motion.form>
+                )}
+              </AnimatePresence>
             </motion.div>
           )}
 

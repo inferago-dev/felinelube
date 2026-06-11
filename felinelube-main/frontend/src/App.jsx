@@ -19,6 +19,8 @@ import Signup from './pages/Signup'
 import Profile from './pages/Profile'
 import Checkout from './pages/Checkout'
 import NotFound from './pages/NotFound'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 
 /* Admin Components */
 import AdminLayout from './layouts/AdminLayout'
@@ -62,7 +64,7 @@ function PublicLayout() {
   }
 
   // Hide CTA, Contact, and Footer in clean layouts
-  const isShopOrAuth = path === '/shop' || path === '/login' || path === '/signup' || path === '/profile' || path === '/checkout' || path === '/contact' || path.startsWith('/product')
+  const isShopOrAuth = path === '/shop' || path === '/login' || path === '/signup' || path === '/profile' || path === '/checkout' || path === '/contact' || path === '/forgot-password' || path === '/reset-password' || path.startsWith('/product')
 
   return (
     <div className="app">
@@ -87,6 +89,8 @@ function PublicLayout() {
           <Route path="/signup" element={<Signup setView={setView} />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

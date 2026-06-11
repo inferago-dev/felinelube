@@ -356,3 +356,61 @@
   padding-right: 2.5rem;
 }
 
+/* ============================================
+   PRINT STYLES FOR INVOICE GENERATION
+   ============================================ */
+@media print {
+  /* Hide sidebar and topbar */
+  .admin-sidebar, .admin-topbar, .admin-hidden-shortcut {
+    display: none !important;
+  }
+  
+  /* Reset layout margins for printing */
+  .admin-main {
+    margin-left: 0 !important;
+  }
+  
+  .admin-layout {
+    background: white !important;
+    color: black !important;
+    min-height: auto;
+  }
+
+  .admin-content {
+    padding: 0 !important;
+    background: white !important;
+  }
+
+  /* Force cards to lose dark background and borders */
+  .admin-card {
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+    break-inside: avoid;
+    margin-bottom: 1rem !important;
+    padding: 1rem !important;
+  }
+
+  /* Hide Action Buttons */
+  button, select, .btn, .admin-sidebar__item {
+    display: none !important;
+  }
+
+  /* Override dark text dim and accents for print clarity */
+  .admin-text-dim, * {
+    color: #333 !important;
+  }
+  
+  h2, h3 {
+    color: #000 !important;
+    border-bottom: 1px solid #000 !important;
+  }
+
+  /* Specifically target the order timeline to print well */
+  .admin-badge {
+    border: 1px solid #000 !important;
+    color: #000 !important;
+  }
+}
+
