@@ -95,10 +95,9 @@ const globalLimiter = rateLimit({
 });
 app.use('/api/', globalLimiter);
 
-// Stricter limiter for auth endpoints to prevent brute force
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 5,
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many authentication attempts, please try again later.' },
@@ -119,6 +118,7 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const homepageRoutes = require('./routes/homepageRoutes');
 const settingRoutes = require('./routes/settingRoutes');
+const enquiryRoutes = require('./routes/enquiryRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -126,6 +126,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/homepage', homepageRoutes);
 app.use('/api/settings', settingRoutes);
+app.use('/api/enquiries', enquiryRoutes);
 
 // ----------------------------------------------------------
 // Health check (no sensitive info exposed)

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiOutlinePlus, HiOutlinePencilAlt, HiOutlineTrash, HiOutlineEyeOff, HiOutlineStar, HiRefresh, HiX, HiSearch, HiFilter } from 'react-icons/hi'
 import API_BASE, { adminAuthHeaders, SERVER_BASE } from '../api'
+import Toast from '../components/Toast'
 import '../styles/Admin.css'
 
 const categories = ['Engine Oils', 'Gear Oils', 'Hydraulic Oils', 'Bulk Oils'];
@@ -39,6 +40,11 @@ export default function AdminProducts() {
   const [imageFile, setImageFile] = useState(null)
   const [pdfFile, setPdfFile] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' })
+
+  const showToast = (message, type = 'success') => {
+    setToast({ show: true, message, type })
+  }
 
   const fetchProducts = async () => {
     try {
@@ -61,17 +67,17 @@ export default function AdminProducts() {
   }, [])
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) return
+    if (!window.confirm('Are you sure you want to delete this product?')) return
     try {
       const res = await fetch(`${API_BASE}/products/admin/${id}`, {
         method: 'DELETE',
         headers: adminAuthHeaders()
       })
-      if (res.ok) {
-        setProducts(products.filter(p => p.id !== id))
-      }
+      if (!res.ok) throw new Error('Failed to delete')
+      showToast('Product deleted successfully', 'success')
+      fetchProducts()
     } catch (err) {
-      alert('Failed to delete product')
+      showToast(err.message, 'error')
     }
   }
 
@@ -175,14 +181,16 @@ export default function AdminProducts() {
       })
 
       if (!res.ok) {
-        const errorData = await res.json()
-        throw new Error(errorData.message || 'Failed to save product')
+        const errData = await res.json()
+        throw new Error(errData.message || 'Failed to save product')
       }
 
-      await fetchProducts()
+      showToast(editingId ? 'Product updated successfully' : 'Product created successfully', 'success')
       closeModal()
+      fetchProducts()
     } catch (err) {
-      alert(err.message)
+      console.error(err)
+      showToast(err.message, 'error')
     } finally {
       setIsSubmitting(false)
     }
@@ -208,6 +216,13 @@ export default function AdminProducts() {
 
   return (
     <div className="admin-content">
+      {toast.show && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast({ ...toast, show: false })} 
+        />
+      )}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ fontSize: '1.5rem', fontWeight: '700' }}>Product Management</h1>
@@ -429,6 +444,15 @@ export default function AdminProducts() {
                   <div className="auth-form-group">
                     <label>Product Image</label>
                     <input className="auth-input" type="file" accept="image/*" onChange={e => setImageFile(e.target.files[0])} style={{ padding: '0.6rem' }} />
+                    {(imageFile || (editingId && formData.image)) && (
+                      <div style={{ marginTop: '0.5rem' }}>
+                        <img 
+                          src={imageFile ? URL.createObjectURL(imageFile) : `${SERVER_BASE}${formData.image}`} 
+                          alt="Preview" 
+                          style={{ height: '100px', borderRadius: '4px', border: '1px solid var(--admin-border)', objectFit: 'contain', background: '#000' }} 
+                        />
+                      </div>
+                    )}
                   </div>
                   <div className="auth-form-group">
                     <label>Datasheet PDF</label>

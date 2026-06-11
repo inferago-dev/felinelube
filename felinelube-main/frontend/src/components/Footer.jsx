@@ -51,7 +51,7 @@ export default function Footer() {
                 title="Feline HQ Mini Map"
               />
               <a 
-                href="https://maps.app.goo.gl/YourGoogleMapsLink" 
+                href="https://www.google.com/maps/place/FELINE+GENUINE+LUBRICANTS+(M)+SDN+BHD/@3.0054,101.5031,17z" 
                 target="_blank" 
                 className="footer__map-link"
               >

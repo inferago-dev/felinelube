@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../config/db');
 
 // @desc    Get all homepage sections
 // @route   GET /api/homepage/admin/all

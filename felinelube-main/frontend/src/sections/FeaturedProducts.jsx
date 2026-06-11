@@ -16,12 +16,12 @@ export default function FeaturedProducts() {
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
-        const res = await fetch(`${API_BASE}/products`)
+        const res = await fetch(`${API_BASE}/products?limit=8`)
         if (res.ok) {
-          const data = await res.json()
-          // Use isFeatured if available, else slice first 3
-          const featured = data.filter(p => p.isFeatured)
-          setFeaturedProducts(featured.length > 0 ? featured.slice(0, 3) : data.slice(0, 3))
+          const json = await res.json()
+          const prods = json.data || (Array.isArray(json) ? json : [])
+          const featured = prods.filter(p => p.isFeatured).slice(0, 4)
+          setFeaturedProducts(featured.length > 0 ? featured : prods.slice(0, 3))
         }
       } catch (err) {
         console.error('Failed to fetch featured products', err)
@@ -63,9 +63,14 @@ export default function FeaturedProducts() {
                 style={{ cursor: 'pointer' }}
               >
                 <div className="product-card__visual">
-                  <div className="product-card__can">
+                  <div className="product-card__can" style={{ background: 'var(--color-bg)', padding: '1rem', borderRadius: '8px' }}>
                     {product.image ? (
-                      <img src={`${SERVER_BASE}${product.image}`} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'contain' }} />
+                      <img 
+                        src={`${SERVER_BASE}${product.image}`} 
+                        alt={`${product.name} — ${product.grade || product.category}`} 
+                        onError={(e) => { e.target.onerror = null; e.target.src = '/placeholder-product.png'; }}
+                        style={{ width: '100%', height: '200px', objectFit: 'contain' }} 
+                      />
                     ) : (
                       <OilCan 
                         accent="#D4A017" 

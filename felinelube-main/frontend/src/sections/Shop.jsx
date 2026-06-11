@@ -16,31 +16,56 @@ export default function Shop() {
   const { addToCart } = useCart()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
   const [activeCat, setActiveCat] = useState('All')
   const [sortBy, setSortBy] = useState('Newest')
   const [isFilterOpen, setIsFilterOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const [hasMore, setHasMore] = useState(true)
 
   // Fetch Live Products from Backend
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true)
-        const res = await fetch(`${API_BASE}/products`)
-        if (!res.ok) throw new Error('Failed to fetch products')
-        const data = await res.json()
-        setProducts(data)
-      } catch (err) {
-        console.error('Fetch Error:', err)
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
+  const fetchProducts = async (pageNum, append = false) => {
+    try {
+      if (append) setLoadingMore(true)
+      else setLoading(true)
 
-    fetchProducts()
+      const res = await fetch(`${API_BASE}/products?page=${pageNum}&limit=12`)
+      if (!res.ok) throw new Error('Failed to fetch products')
+      const json = await res.json()
+      
+      const newProducts = json.data || (Array.isArray(json) ? json : [])
+      
+      if (append) {
+        setProducts(prev => [...prev, ...newProducts])
+      } else {
+        setProducts(newProducts)
+      }
+
+      if (json.pagination) {
+        setHasMore(pageNum < json.pagination.totalPages)
+      } else {
+        setHasMore(false) // fallback if backend doesn't support pagination
+      }
+    } catch (err) {
+      console.error('Fetch Error:', err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+      setLoadingMore(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts(1, false)
   }, [])
+
+  const loadMore = () => {
+    const nextPage = page + 1
+    setPage(nextPage)
+    fetchProducts(nextPage, true)
+  }
 
   const filteredProducts = useMemo(() => {
     return products
@@ -139,10 +164,16 @@ export default function Shop() {
 
           <main className="shop-grid">
             {loading ? (
-              <div className="shop-loading">
-                <HiRefresh className="spin" />
-                <p>Syncing Marketplace...</p>
-              </div>
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="skeleton-card">
+                  <div className="skeleton-img"></div>
+                  <div className="skeleton-body">
+                    <div className="skeleton-line"></div>
+                    <div className="skeleton-line short"></div>
+                    <div className="skeleton-line"></div>
+                  </div>
+                </div>
+              ))
             ) : (
               <AnimatePresence mode="popLayout">
                 {filteredProducts.map((product, i) => {
@@ -162,7 +193,12 @@ export default function Shop() {
                       <div className="product-card__visual">
                         <div className="product-card__can">
                           {product.image ? (
-                            <img src={`${SERVER_BASE}${product.image}`} alt={product.name} style={{ width: '100%', height: '200px', objectFit: 'contain' }} />
+                            <img 
+                              src={`${SERVER_BASE}${product.image}`} 
+                              alt={`${product.name} — ${product.grade || product.category}`} 
+                              onError={(e) => { e.target.onerror = null; e.target.src = '/placeholder-product.png'; }}
+                              style={{ width: '100%', height: '200px', objectFit: 'contain' }} 
+                            />
                           ) : (
                             <OilCan {...getOilCanProps(product)} />
                           )}
@@ -204,6 +240,18 @@ export default function Shop() {
               <div className="no-results error">
                 <h3>Connection Error</h3>
                 <p>Could not connect to the backend server. Make sure it is running.</p>
+              </div>
+            )}
+
+            {!loading && hasMore && filteredProducts.length > 0 && search === '' && activeCat === 'All' && (
+              <div style={{ gridColumn: '1 / -1', textAlign: 'center', marginTop: '2rem' }}>
+                <button 
+                  className="btn btn-primary" 
+                  onClick={loadMore} 
+                  disabled={loadingMore}
+                >
+                  {loadingMore ? 'Loading...' : 'Load More'}
+                </button>
               </div>
             )}
           </main>

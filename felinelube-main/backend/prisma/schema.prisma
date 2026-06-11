@@ -122,3 +122,11 @@ model HomepageContent {
   content   Json
   updatedAt DateTime @updatedAt
 }
+model Enquiry {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  message   String
+  status    String   @default("NEW") // NEW, READ, REPLIED
+  createdAt DateTime @default(now())
+}

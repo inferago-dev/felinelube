@@ -263,3 +263,39 @@
     align-items: stretch;
   }
 }
+
+/* Skeletons */
+.skeleton-card {
+  background: var(--color-surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 400px;
+}
+.skeleton-img {
+  height: 200px;
+  background: rgba(255, 255, 255, 0.05);
+  animation: pulse 1.5s infinite;
+}
+.skeleton-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.skeleton-line {
+  height: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  animation: pulse 1.5s infinite;
+  border-radius: 4px;
+}
+.skeleton-line.short {
+  width: 50%;
+}
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}

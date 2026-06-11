@@ -140,6 +140,7 @@
   background: none;
   border: none;
   cursor: pointer;
+  z-index: 1001;
 }
 
 .navbar__toggle span {
@@ -149,7 +150,7 @@
   transition: all 0.3s ease;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 768px) {
   .navbar__links {
     display: none;
   }

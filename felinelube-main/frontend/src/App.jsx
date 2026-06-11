@@ -18,6 +18,7 @@ import Login from './pages/Login'
 import Signup from './pages/Signup'
 import Profile from './pages/Profile'
 import Checkout from './pages/Checkout'
+import NotFound from './pages/NotFound'
 
 /* Admin Components */
 import AdminLayout from './layouts/AdminLayout'
@@ -86,7 +87,7 @@ function PublicLayout() {
           <Route path="/signup" element={<Signup setView={setView} />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
 
@@ -116,12 +117,14 @@ function AdminHiddenShortcut() {
 
 import { CartProvider } from './context/CartContext'
 import CartDrawer from './components/CartDrawer'
+import ErrorBoundary from './components/ErrorBoundary'
 
 function App() {
   return (
-    <CartProvider>
-      <ScrollToTop />
-      <CartDrawer />
+    <ErrorBoundary>
+      <CartProvider>
+        <ScrollToTop />
+        <CartDrawer />
       <Routes>
         {/* Admin Login page */}
         <Route path="/admin/login" element={<AdminLogin />} />
@@ -140,6 +143,7 @@ function App() {
         <Route path="/*" element={<PublicLayout />} />
       </Routes>
     </CartProvider>
+    </ErrorBoundary>
   )
 }
 
@@ -147,7 +151,7 @@ function AdminRoutes() {
   return (
     <AdminLayout>
       <Routes>
-        <Route path="/" element={<Navigate to="dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="products" element={<AdminProducts />} />
         <Route path="orders" element={<AdminOrders />} />
@@ -157,7 +161,7 @@ function AdminRoutes() {
         <Route path="settings" element={<AdminSettings />} />
         <Route path="notifications" element={<AdminNotifications />} />
         <Route path="profile" element={<AdminProfile />} />
-        <Route path="*" element={<Navigate to="dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
       </Routes>
     </AdminLayout>
   )

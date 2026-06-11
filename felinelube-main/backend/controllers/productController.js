@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../config/db');
 
 // Allowed status values to prevent arbitrary data injection
 const ALLOWED_PRODUCT_STATUSES = ['ACTIVE', 'INACTIVE', 'DRAFT'];
@@ -18,17 +17,35 @@ const sanitizeStr = (val, maxLen = 500) =>
   typeof val === 'string' ? val.trim().slice(0, maxLen) : undefined;
 
 // ---------------------------------------------------------------
-// @desc    Get all products (Public)
+// @desc    Get all products (Public) with pagination
 // @route   GET /api/products
 // ---------------------------------------------------------------
 exports.getProducts = async (req, res) => {
   try {
-    const products = await prisma.product.findMany({
-      where: { status: 'ACTIVE' },
-      include: { images: true },
-      orderBy: { createdAt: 'desc' },
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 12;
+    const skip = (page - 1) * limit;
+
+    const [products, total] = await Promise.all([
+      prisma.product.findMany({
+        where: { status: 'ACTIVE' },
+        include: { images: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      prisma.product.count({ where: { status: 'ACTIVE' } })
+    ]);
+
+    return res.json({
+      data: products,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
+      }
     });
-    return res.json(products);
   } catch (error) {
     console.error('getProducts error:', error);
     return res.status(500).json({ message: 'Server error fetching products' });

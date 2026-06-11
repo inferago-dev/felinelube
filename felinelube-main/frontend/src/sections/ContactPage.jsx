@@ -3,16 +3,70 @@ import { motion } from 'framer-motion'
 import { HiMail, HiPhone, HiLocationMarker, HiClock, HiArrowRight } from 'react-icons/hi'
 import { FaWhatsapp } from 'react-icons/fa'
 import { useLanguage } from '../context/LanguageContext'
+import API_BASE from '../api'
 import '../styles/ContactPage.css'
 
 export default function ContactPage() {
   const { t, lang } = useLanguage()
-  const [formState, setFormState] = useState('idle') // idle, sending, success
+  const [formState, setFormState] = useState('idle') // idle, sending, success, error
+  const [formData, setFormData] = useState({ name: '', email: '', subject: 'General Inquiry', message: '' })
+  const [errors, setErrors] = useState({})
 
-  const handleSubmit = (e) => {
+  const validateField = (name, value) => {
+    let error = ''
+    if (name === 'name') {
+      if (!value.trim()) error = 'Name is required'
+      else if (value.trim().length < 2) error = 'Name must be at least 2 characters'
+      else if (value.trim().length > 100) error = 'Name cannot exceed 100 characters'
+    } else if (name === 'email') {
+      if (!value.trim()) error = 'Email is required'
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) error = 'Invalid email address'
+    } else if (name === 'message') {
+      if (!value.trim()) error = 'Message is required'
+      else if (value.trim().length < 10) error = 'Message must be at least 10 characters'
+      else if (value.trim().length > 1000) error = 'Message cannot exceed 1000 characters'
+    }
+    return error
+  }
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target
+    const error = validateField(name, value)
+    setErrors(prev => ({ ...prev, [name]: error }))
+  }
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const isFormValid = () => {
+    return (
+      !validateField('name', formData.name) &&
+      !validateField('email', formData.email) &&
+      !validateField('message', formData.message)
+    )
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!isFormValid()) return
+
     setFormState('sending')
-    setTimeout(() => setFormState('success'), 1500)
+    try {
+      const res = await fetch(`${API_BASE}/enquiries`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      if (res.ok) {
+        setFormState('success')
+        setFormData({ name: '', email: '', subject: 'General Inquiry', message: '' })
+      } else {
+        setFormState('error')
+      }
+    } catch (err) {
+      setFormState('error')
+    }
   }
 
   return (
@@ -74,20 +128,27 @@ export default function ContactPage() {
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="premium-form">
+                {formState === 'error' && (
+                  <div style={{ color: '#ff4d4d', marginBottom: '1rem', padding: '0.5rem', background: 'rgba(255,0,0,0.1)', borderRadius: '4px' }}>
+                    Failed to send message. Please try again.
+                  </div>
+                )}
                 <div className="form-row">
                   <div className="form-group">
                     <label>{lang === 'en' ? 'Full Name' : 'Nama Penuh'}</label>
-                    <input type="text" required placeholder="John Doe" />
+                    <input type="text" name="name" value={formData.name} onChange={handleChange} onBlur={handleBlur} required placeholder="John Doe" />
+                    {errors.name && <span style={{ color: '#ff4d4d', fontSize: '0.8rem', marginTop: '4px' }}>{errors.name}</span>}
                   </div>
                   <div className="form-group">
                     <label>{lang === 'en' ? 'Email Address' : 'Alamat Emel'}</label>
-                    <input type="email" required placeholder="john@example.com" />
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} required placeholder="john@example.com" />
+                    {errors.email && <span style={{ color: '#ff4d4d', fontSize: '0.8rem', marginTop: '4px' }}>{errors.email}</span>}
                   </div>
                 </div>
                 
                 <div className="form-group">
                   <label>{lang === 'en' ? 'Subject' : 'Subjek'}</label>
-                  <select>
+                  <select name="subject" value={formData.subject} onChange={handleChange}>
                     <option>{lang === 'en' ? 'General Inquiry' : 'Pertanyaan Am'}</option>
                     <option>{lang === 'en' ? 'Technical Support' : 'Sokongan Teknikal'}</option>
                     <option>{lang === 'en' ? 'Bulk Purchase' : 'Pembelian Pukal'}</option>
@@ -97,10 +158,11 @@ export default function ContactPage() {
 
                 <div className="form-group">
                   <label>{lang === 'en' ? 'Message' : 'Mesej'}</label>
-                  <textarea rows="5" required placeholder={lang === 'en' ? 'How can we help you?' : 'Bagaimana kami boleh membantu anda?'}></textarea>
+                  <textarea name="message" value={formData.message} onChange={handleChange} onBlur={handleBlur} rows="5" required placeholder={lang === 'en' ? 'How can we help you?' : 'Bagaimana kami boleh membantu anda?'}></textarea>
+                  {errors.message && <span style={{ color: '#ff4d4d', fontSize: '0.8rem', marginTop: '4px' }}>{errors.message}</span>}
                 </div>
 
-                <button type="submit" className="btn btn-primary w-full" disabled={formState === 'sending'}>
+                <button type="submit" className="btn btn-primary w-full" disabled={formState === 'sending' || !isFormValid()}>
                   {formState === 'sending' ? (lang === 'en' ? 'Sending...' : 'Menghantar...') : (lang === 'en' ? 'Send Message' : 'Hantar Mesej')} 
                   <HiArrowRight />
                 </button>
