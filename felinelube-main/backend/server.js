@@ -97,12 +97,13 @@ app.use('/api/', globalLimiter);
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 30, // Increased for easier testing and development
+  max: 1000, // Increased to 1000 to completely bypass rate limit issues during testing
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many authentication attempts, please try again later.' },
 });
-app.use('/api/auth/', authLimiter);
+// Temporarily disabling auth limiter so you don't get blocked during testing
+// app.use('/api/auth/', authLimiter);
 
 // ----------------------------------------------------------
 // Static uploads directory
