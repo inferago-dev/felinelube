@@ -180,3 +180,53 @@
   .admin-main { margin-left: 0; }
   .admin-stats-grid { grid-template-columns: 1fr; }
 }
+
+/* ============================================
+   ADMIN FORM INPUT OVERRIDES (auth-input)
+   ============================================ */
+.admin-layout .auth-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.admin-layout .auth-form-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--admin-text-dim);
+}
+
+.admin-layout .auth-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  color: var(--admin-text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.admin-layout .auth-input:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.15);
+}
+
+.admin-layout textarea.auth-input {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.admin-layout select.auth-input {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A9A9A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25em;
+  padding-right: 2.5rem;
+}
+
