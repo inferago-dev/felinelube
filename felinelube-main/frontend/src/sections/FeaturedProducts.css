@@ -69,11 +69,11 @@
 
 .product-card:hover {
   transform: translateY(-10px);
-  box-shadow: var(--shadow-elevated), 0 0 0 1px rgba(212, 160, 23, 0.2);
+  box-shadow: var(--shadow-elevated), 0 0 0 1px var(--color-border-gold);
 }
 
 .product-card:hover::after {
-  border-color: rgba(212, 160, 23, 0.2);
+  border-color: var(--color-border-gold);
 }
 
 /* Product Visual */

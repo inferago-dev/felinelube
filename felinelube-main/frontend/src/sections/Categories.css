@@ -54,7 +54,7 @@
 }
 
 .cat-card:hover {
-  border-color: rgba(212, 160, 23, 0.3);
+  border-color: var(--color-border-gold);
   transform: translateY(-8px);
   box-shadow: var(--shadow-elevated);
 }
