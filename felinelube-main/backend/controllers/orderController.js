@@ -151,3 +151,74 @@ exports.getMyOrders = async (req, res) => {
     return res.status(500).json({ message: 'Server error fetching orders' });
   }
 };
+
+// ---------------------------------------------------------------
+// @desc    Update Order Details (Admin Notes & Shipping Info)
+// @route   PUT /api/orders/admin/:id/details
+// @access  Private/Admin
+// ---------------------------------------------------------------
+exports.updateOrderDetails = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { adminNotes, courierName, trackingId, estimatedDelivery, status } = req.body;
+
+    if (!id || typeof id !== 'string') {
+      return res.status(400).json({ message: 'Invalid order ID' });
+    }
+
+    const updateData = {};
+    if (adminNotes !== undefined) updateData.adminNotes = sanitizeStr(adminNotes, 2000);
+    if (courierName !== undefined) updateData.courierName = sanitizeStr(courierName, 100);
+    if (trackingId !== undefined) updateData.trackingId = sanitizeStr(trackingId, 100);
+    if (estimatedDelivery !== undefined) {
+      updateData.estimatedDelivery = estimatedDelivery ? new Date(estimatedDelivery) : null;
+    }
+    if (status !== undefined) {
+      if (!ALLOWED_ORDER_STATUSES.includes(status)) {
+        return res.status(400).json({ message: 'Invalid status' });
+      }
+      updateData.status = status;
+    }
+
+    const order = await prisma.order.update({
+      where: { id },
+      data: updateData,
+    });
+
+    return res.json(order);
+  } catch (error) {
+    console.error('updateOrderDetails error:', error);
+    return res.status(400).json({ message: 'Failed to update order details' });
+  }
+};
+
+// ---------------------------------------------------------------
+// @desc    Upload Invoice PDF
+// @route   POST /api/orders/admin/:id/invoice
+// @access  Private/Admin
+// ---------------------------------------------------------------
+exports.uploadInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id || typeof id !== 'string') {
+      return res.status(400).json({ message: 'Invalid order ID' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const invoiceUrl = `/${req.file.path.replace(/\\/g, '/')}`;
+
+    const order = await prisma.order.update({
+      where: { id },
+      data: { invoiceUrl },
+    });
+
+    return res.json(order);
+  } catch (error) {
+    console.error('uploadInvoice error:', error);
+    return res.status(400).json({ message: 'Failed to upload invoice' });
+  }
+};

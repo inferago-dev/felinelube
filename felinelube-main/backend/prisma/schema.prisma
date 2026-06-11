@@ -86,11 +86,16 @@ model Order {
   address       String
   totalAmount   Float
   paymentMethod String      @default("COD")
-  status        String      @default("PENDING") // PENDING, CONFIRMED, PACKED, SHIPPED, DELIVERED, CANCELLED
-  notes         String?
-  items         OrderItem[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  status            String      @default("PENDING") // PENDING, CONFIRMED, PACKED, SHIPPED, DELIVERED, CANCELLED
+  notes             String?
+  adminNotes        String?
+  courierName       String?
+  trackingId        String?
+  estimatedDelivery DateTime?
+  invoiceUrl        String?
+  items             OrderItem[]
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
 }
 
 model OrderItem {
