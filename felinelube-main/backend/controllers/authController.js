@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/db');
 const crypto = require('crypto');
-const { sendOTP, sendPasswordReset } = require('../utils/emailService');
+const { sendPasswordReset } = require('../utils/emailService');
 
 // ============================================================
 // SECURITY: JWT_SECRET MUST come from environment variable.
@@ -64,15 +64,9 @@ const registerUser = async (req, res) => {
     // Hash password with cost factor 12 (stronger than default 10)
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Generate OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
-
     const user = await prisma.user.create({
-      data: { name: cleanName, email: cleanEmail, password: hashedPassword, otp, otpExpiry, isVerified: false },
+      data: { name: cleanName, email: cleanEmail, password: hashedPassword, isVerified: true },
     });
-
-    await sendOTP(user.email, otp);
 
     return res.status(201).json({
       id: user.id,
@@ -80,7 +74,7 @@ const registerUser = async (req, res) => {
       email: user.email,
       isVerified: user.isVerified,
       token: generateToken(user.id),
-      message: 'Registration successful. Please verify your email with the OTP sent.'
+      message: 'Registration successful.'
     });
   } catch (error) {
     // Never leak internal error details to the client
@@ -121,19 +115,7 @@ const loginUser = async (req, res) => {
       return res.status(403).json({ message: 'Account is suspended' });
     }
 
-    if (!user.isVerified) {
-      // Regenerate OTP if logging in unverified
-      const otp = Math.floor(100000 + Math.random() * 900000).toString();
-      const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
-      await prisma.user.update({ where: { id: user.id }, data: { otp, otpExpiry } });
-      await sendOTP(user.email, otp);
-      
-      return res.status(403).json({ 
-        message: 'Email not verified. A new OTP has been sent.', 
-        requiresOTP: true, 
-        email: user.email 
-      });
-    }
+
 
     return res.json({
       id: user.id,
@@ -247,35 +229,7 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-// ---------------------------------------------------------------
-// @desc    Verify OTP for account activation
-// @route   POST /api/auth/verify-otp
-// @access  Public
-// ---------------------------------------------------------------
-const verifyOTP = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    if (!email || !otp) return res.status(400).json({ message: 'Email and OTP required' });
 
-    const user = await prisma.user.findUnique({ where: { email: sanitizeEmail(email) } });
-    if (!user) return res.status(400).json({ message: 'Invalid request' });
-
-    if (user.isVerified) return res.status(400).json({ message: 'User already verified' });
-    if (user.otp !== otp || new Date() > user.otpExpiry) {
-      return res.status(400).json({ message: 'Invalid or expired OTP' });
-    }
-
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { isVerified: true, otp: null, otpExpiry: null }
-    });
-
-    return res.json({ message: 'Email verified successfully. You can now log in.' });
-  } catch (error) {
-    console.error('Verify OTP error:', error);
-    return res.status(500).json({ message: 'Server error during OTP verification' });
-  }
-};
 
 // ---------------------------------------------------------------
 // @desc    Forgot Password - Send Reset Link
@@ -380,5 +334,5 @@ const changePassword = async (req, res) => {
 
 module.exports = { 
   registerUser, loginUser, registerAdmin, loginAdmin, 
-  verifyOTP, forgotPassword, resetPassword, changePassword 
+  forgotPassword, resetPassword, changePassword 
 };

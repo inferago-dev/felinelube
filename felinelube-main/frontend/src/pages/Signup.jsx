@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiOutlineMail, HiOutlineLockClosed, HiOutlineUser } from 'react-icons/hi';
 import API_BASE from '../api';
-import OTPModal from '../components/OTPModal';
 import '../styles/Auth.css';
 
 export default function Signup() {
@@ -15,14 +14,7 @@ export default function Signup() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showOtp, setShowOtp] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState('');
   const navigate = useNavigate();
-
-  const handleOtpSuccess = () => {
-    setShowOtp(false);
-    navigate('/login'); // Redirect to login so they can sign in with their new verified account
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -52,8 +44,15 @@ export default function Signup() {
         throw new Error(data.message || 'Failed to register');
       }
 
-      setRegisteredEmail(formData.email);
-      setShowOtp(true);
+      // Success - save token and user info
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify({
+        id: data.id,
+        name: data.name,
+        email: data.email
+      }));
+      
+      navigate('/profile');
       
     } catch (err) {
       setError(err.message || 'An error occurred during registration');
@@ -64,12 +63,6 @@ export default function Signup() {
 
   return (
     <div className="auth-page">
-      <OTPModal 
-        isOpen={showOtp} 
-        onClose={() => setShowOtp(false)} 
-        email={registeredEmail} 
-        onSuccess={handleOtpSuccess} 
-      />
       <motion.div 
         className="auth-card"
         initial={{ opacity: 0, y: 20 }}

@@ -3,22 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { HiOutlineMail, HiOutlineLockClosed } from 'react-icons/hi';
 import API_BASE from '../api';
-import OTPModal from '../components/OTPModal';
 import '../styles/Auth.css';
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showOtp, setShowOtp] = useState(false);
-  const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const navigate = useNavigate();
-
-  const handleOtpSuccess = () => {
-    setShowOtp(false);
-    // Auto-retry login after successful OTP
-    handleSubmit(new Event('submit'));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,11 +26,6 @@ export default function Login() {
       const data = await response.json();
       
       if (!response.ok) {
-        if (data.requiresOTP) {
-          setUnverifiedEmail(data.email);
-          setShowOtp(true);
-          return;
-        }
         throw new Error(data.message || 'Failed to login');
       }
 
@@ -61,12 +47,6 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <OTPModal 
-        isOpen={showOtp} 
-        onClose={() => setShowOtp(false)} 
-        email={unverifiedEmail} 
-        onSuccess={handleOtpSuccess} 
-      />
       <motion.div 
         className="auth-card"
         initial={{ opacity: 0, y: 20 }}
