@@ -40,7 +40,8 @@ export default function AdminLayout({ children }) {
     <div className="admin-layout">
       {/* Sidebar */}
       <aside className="admin-sidebar">
-        <div className="admin-sidebar__logo">
+        <div className="admin-sidebar__logo" onClick={() => navigate('/')} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <img src="/logo.png" alt="Feline Logo" style={{ height: '30px', objectFit: 'contain' }} />
           <div className="admin-sidebar__logo-text"><span>Feline</span> Admin</div>
         </div>
         

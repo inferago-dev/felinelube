@@ -78,6 +78,18 @@
   opacity: 1;
 }
 
+[data-theme='light'] .cert-card {
+  background: var(--color-surface);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='light'] .cert-card:hover {
+  border-color: rgba(212, 160, 23, 0.4);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08), 0 0 20px rgba(212, 160, 23, 0.1);
+  background: var(--color-surface-elevated);
+}
+
 /* Icon */
 .cert-card__icon {
   width: 64px;
