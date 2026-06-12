@@ -80,7 +80,7 @@
 
 [data-theme='light'] .cert-card {
   background: var(--color-surface);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-border);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
