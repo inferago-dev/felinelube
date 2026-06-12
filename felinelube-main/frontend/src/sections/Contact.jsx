@@ -10,7 +10,7 @@ export default function Contact() {
     {
       icon: <HiLocationMarker />,
       title: lang === 'en' ? 'Our Headquarters' : 'Ibu Pejabat Kami',
-      detail: 'No. 5, Jalan Injap 34/4, Section 34, Alpine Industrial Park, 40470 Shah Alam, Selangor, Malaysia',
+      detail: 'No: 5, Jalan Injap 34/4, Section 34,Alpine Industrial Park, 40470 Shah Alam, Selangor, Malaysia',
     },
     {
       icon: <HiPhone />,

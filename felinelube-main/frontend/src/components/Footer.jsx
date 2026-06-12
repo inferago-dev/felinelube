@@ -114,7 +114,7 @@ export default function Footer() {
             <ul className="footer__contact-list">
               <li>
                 <HiLocationMarker className="gold-text" style={{ flexShrink: 0, marginTop: '3px' }} />
-                <span>No. 5, Jalan Injap 34/4, Section 34, Alpine Industrial Park, 40470 Shah Alam, Selangor, Malaysia</span>
+                <span>No: 5, Jalan Injap 34/4, Section 34,Alpine Industrial Park, 40470 Shah Alam, Selangor, Malaysia</span>
               </li>
               <li>
                 <HiPhone className="gold-text" />

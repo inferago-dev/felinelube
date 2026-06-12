@@ -216,7 +216,7 @@ export default function ContactPage() {
               <HiLocationMarker className="hq-icon" />
               <div>
                 <h4>{lang === 'en' ? 'Headquarters' : 'Ibu Pejabat'}</h4>
-                <p>No. 5, Jalan Injap 34/4, Section 34, Alpine Industrial Park, 40470 Shah Alam, Selangor, Malaysia</p>
+                <p>No: 5, Jalan Injap 34/4, Section 34,Alpine Industrial Park, 40470 Shah Alam, Selangor, Malaysia</p>
               </div>
             </div>
           </motion.div>
