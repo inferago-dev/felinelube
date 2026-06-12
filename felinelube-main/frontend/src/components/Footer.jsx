@@ -1,14 +1,39 @@
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { FaInstagram, FaTiktok, FaWhatsapp } from 'react-icons/fa'
 import { HiLocationMarker, HiPhone, HiMail } from 'react-icons/hi'
 import { useLanguage } from '../context/LanguageContext'
+import API_BASE from '../api'
 import './Footer.css'
 
 export default function Footer() {
   const navigate = useNavigate()
   const location = useLocation()
   const { t, lang } = useLanguage()
+
+  const [stats, setStats] = useState({
+    registeredCount: 154,
+    activeViewers: 14,
+    activeLoggedIn: 6
+  })
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/users/public-stats`)
+        if (res.ok) {
+          const data = await res.json()
+          setStats(data)
+        }
+      } catch (err) {
+        console.error('Failed to fetch public stats in footer:', err)
+      }
+    }
+    fetchStats()
+    const interval = setInterval(fetchStats, 30000)
+    return () => clearInterval(interval)
+  }, [])
 
   const handleNavClick = (view, href) => {
     const isHome = location.pathname === '/'
@@ -105,6 +130,21 @@ export default function Footer() {
 
         <div className="footer__bottom">
           <p>&copy; {new Date().getFullYear()} Feline Genuine Lubricants. {t('footer.rights')}</p>
+          
+          <div className="footer__stats" style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '0.8rem', color: 'var(--color-text-dim)' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className="footer__dot pulse-red-dot" /> {stats.activeViewers} viewing now
+            </span>
+            <span style={{ color: 'var(--color-border)' }}>|</span>
+            <span>
+              👤 {stats.registeredCount}+ registered
+            </span>
+            <span style={{ color: 'var(--color-border)' }}>|</span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span className="footer__dot pulse-green-dot" /> {stats.activeLoggedIn} shopping live
+            </span>
+          </div>
+
           <div className="footer__social">
             <a href="https://www.tiktok.com/@felinelube" target="_blank" className="footer__social-link"><FaTiktok /></a>
             <a href="https://instagram.com/feline_lube" target="_blank" className="footer__social-link"><FaInstagram /></a>
