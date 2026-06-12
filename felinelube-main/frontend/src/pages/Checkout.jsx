@@ -5,6 +5,7 @@ import { HiOutlineShoppingCart, HiOutlineCheckCircle, HiArrowLeft } from 'react-
 import { useCart } from '../context/CartContext'
 import API_BASE, { authHeaders } from '../api'
 import '../styles/Auth.css' // Reuse auth styling for form
+import SocialProofWidget from '../components/SocialProofWidget'
 
 export default function Checkout() {
   const { cartItems, cartTotal, clearCart } = useCart()
@@ -213,6 +214,7 @@ export default function Checkout() {
             </div>
           </div>
 
+          <SocialProofWidget />
         </motion.div>
       </div>
     </div>

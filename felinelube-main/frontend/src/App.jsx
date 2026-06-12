@@ -7,7 +7,7 @@ import Categories from './sections/Categories'
 import FeaturedProducts from './sections/FeaturedProducts'
 import WhyFeline from './sections/WhyFeline'
 import About from './sections/About'
-import Certifications from './sections/Certifications'
+import WhatsAppWidget from './components/WhatsAppWidget'
 import Contact from './sections/Contact'
 import CTA from './sections/CTA'
 import Footer from './components/Footer'
@@ -79,7 +79,6 @@ function PublicLayout() {
               <FeaturedProducts setView={setView} />
               <WhyFeline />
               <section id="about"><About /></section>
-              <Certifications />
             </>
           } />
           <Route path="/shop" element={<Shop setView={setView} />} />
@@ -103,6 +102,7 @@ function PublicLayout() {
       )}
 
       <Footer setView={setView} />
+      <WhatsAppWidget />
       <AdminHiddenShortcut />
     </div>
   )

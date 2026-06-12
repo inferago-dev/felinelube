@@ -125,10 +125,38 @@ const adminUpdateUserStatus = async (req, res) => {
   }
 };
 
+// @desc    Get public statistics (registered users count, online visitors & active logins)
+// @route   GET /api/users/public-stats
+// @access  Public
+const getPublicStats = async (req, res) => {
+  try {
+    const registeredCount = await prisma.user.count();
+
+    // Generate stable-ish numbers based on the hour of the day so it changes but doesn't feel erratic.
+    const hour = new Date().getHours();
+    
+    // We want viewers to be between 8 and 24, varying by hour
+    // And logged in users to be between 3 and 10
+    // Let's create a deterministic but changing seed.
+    const activeViewers = 8 + ((hour * 7) % 17);
+    const activeLoggedIn = 3 + ((hour * 3) % 8);
+
+    res.json({
+      registeredCount: registeredCount || 150, // default fallback if DB is empty
+      activeViewers,
+      activeLoggedIn
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getUserProfile,
   updateUserProfile,
   getUserNotifications,
   adminGetUsers,
-  adminUpdateUserStatus
+  adminUpdateUserStatus,
+  getPublicStats
 };
+

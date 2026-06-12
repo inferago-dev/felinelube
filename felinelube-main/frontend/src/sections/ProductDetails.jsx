@@ -9,6 +9,7 @@ import OilCan from '../components/OilCan'
 import API_BASE, { SERVER_BASE } from '../api'
 import '../styles/ProductDetails.css'
 import FeaturedProducts from './FeaturedProducts'
+import SocialProofWidget from '../components/SocialProofWidget'
 
 const ProductDetails = () => {
   const { slug } = useParams()
@@ -161,6 +162,8 @@ const ProductDetails = () => {
                 </div>
               )}
             </div>
+
+            <SocialProofWidget />
           </div>
         </motion.div>
       </section>
