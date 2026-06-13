@@ -14,13 +14,6 @@ const fadeUp = {
   }),
 }
 
-const float = {
-  animate: {
-    y: [0, -14, 0],
-    transition: { duration: 5, repeat: Infinity, ease: 'easeInOut' },
-  },
-}
-
 const glowPulse = {
   animate: {
     opacity: [0.6, 1, 0.6],
@@ -60,18 +53,28 @@ export default function Hero({ setView }) {
 
   return (
     <section className="hero" id="home">
-      {/* Background */}
-      <div className="hero__bg">
-        <div className="hero__bg-gradient" />
-        <div className="hero__bg-grid" />
-        <div className="hero__bg-noise" />
-        <motion.div className="hero__glow hero__glow--primary" variants={glowPulse} animate="animate" />
-        <motion.div className="hero__glow hero__glow--secondary" variants={glowPulse} animate="animate" style={{ animationDelay: '2s' }} />
+      {/* Full cinematic factory background image */}
+      <div className="hero__factory-bg">
+        <img
+          src="/factory-hero.png"
+          alt="Feline Industrial Lubricant Factory"
+          className="hero__factory-img"
+        />
+        {/* Layered overlays for text readability */}
+        <div className="hero__factory-overlay-left" />
+        <div className="hero__factory-overlay-vignette" />
+        <div className="hero__factory-overlay-top" />
       </div>
 
-      {/* Main Content */}
+      {/* Decorative animated glow orbs */}
+      <div className="hero__bg" style={{ zIndex: 2 }}>
+        <motion.div className="hero__glow hero__glow--primary" variants={glowPulse} animate="animate" />
+        <motion.div className="hero__glow hero__glow--secondary" variants={glowPulse} animate="animate" style={{ animationDelay: '2s' }} />
+        <div className="hero__bg-noise" />
+      </div>
+
+      {/* Main Content — left-aligned over the image */}
       <div className="hero__container">
-        {/* Left */}
         <div className="hero__content">
           <motion.div className="hero__badge" custom={0} variants={fadeUp} initial="hidden" animate="visible">
             <span className="hero__badge-dot" />
@@ -95,7 +98,7 @@ export default function Hero({ setView }) {
             <button className="btn btn-primary" onClick={handleExplore}>
               {t('hero.cta')} <HiArrowRight />
             </button>
-            <button className="btn btn-secondary" onClick={() => scrollTo('#about')}>
+            <button className="btn btn-secondary hero__btn-glass" onClick={() => scrollTo('#about')}>
               <HiPlay /> {t('nav.about')}
             </button>
           </motion.div>
@@ -115,32 +118,6 @@ export default function Hero({ setView }) {
             ))}
           </motion.div>
         </div>
-
-        {/* Right Visual — Oil Barrel */}
-        <motion.div
-          className="hero__visual"
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.9, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
-        >
-          <div className="hero__barrel-display">
-            {/* Glow aura behind barrel */}
-            <div className="hero__barrel-glow" />
-
-            {/* Rotating ring decorations */}
-            <motion.div className="hero__ring hero__ring--1" animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: 'linear' }} />
-            <motion.div className="hero__ring hero__ring--2" animate={{ rotate: -360 }} transition={{ duration: 35, repeat: Infinity, ease: 'linear' }} />
-
-            {/* Barrel image with float animation */}
-            <motion.div className="hero__barrel-wrap" variants={float} animate="animate">
-              <img
-                src="/oil-barrel.png"
-                alt="Feline Industrial Oil Barrel"
-                className="hero__barrel-img"
-              />
-            </motion.div>
-          </div>
-        </motion.div>
       </div>
     </section>
   )
