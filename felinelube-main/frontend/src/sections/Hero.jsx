@@ -116,25 +116,28 @@ export default function Hero({ setView }) {
           </motion.div>
         </div>
 
-        {/* Right Visual */}
+        {/* Right Visual — Oil Barrel */}
         <motion.div
           className="hero__visual"
           initial={{ opacity: 0, x: 40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.9, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
         >
-          <div className="hero__oil-display">
+          <div className="hero__barrel-display">
+            {/* Glow aura behind barrel */}
+            <div className="hero__barrel-glow" />
+
+            {/* Rotating ring decorations */}
             <motion.div className="hero__ring hero__ring--1" animate={{ rotate: 360 }} transition={{ duration: 25, repeat: Infinity, ease: 'linear' }} />
             <motion.div className="hero__ring hero__ring--2" animate={{ rotate: -360 }} transition={{ duration: 35, repeat: Infinity, ease: 'linear' }} />
-            
-            <motion.div className="hero__product-wrap" variants={float} animate="animate">
-                <div className="hero__img-frame">
-                  <img 
-                    src="/sports-car.png" 
-                    alt="High Performance Sports Car" 
-                    className="hero__product-img" 
-                  />
-                </div>
+
+            {/* Barrel image with float animation */}
+            <motion.div className="hero__barrel-wrap" variants={float} animate="animate">
+              <img
+                src="/oil-barrel.png"
+                alt="Feline Industrial Oil Barrel"
+                className="hero__barrel-img"
+              />
             </motion.div>
           </div>
         </motion.div>
