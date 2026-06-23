@@ -119,7 +119,7 @@ export default function WhyFeline() {
             initial="hidden"
             animate={inView ? 'visible' : 'hidden'}
           >
-            {['API SN/CF', 'ISO 9001:2015', 'SAE 5W-40 / 15W-40', 'ISO 14001'].map(c => (
+            {['JASO MA2', 'ISO 9001:2015', 'SAE 5W-40 / 15W-40', 'ISO 14001'].map(c => (
               <div key={c} className="wf__cert">
                 <svg width="7" height="7" viewBox="0 0 7 7" fill="none">
                   <circle cx="3.5" cy="3.5" r="3.5" fill="#22c55e" />
@@ -155,7 +155,7 @@ export default function WhyFeline() {
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
           >
-            <div className="wf__badge-val">API SN</div>
+            <div className="wf__badge-val">Premium</div>
             <div className="wf__badge-lbl">Certified Grade</div>
           </motion.div>
 

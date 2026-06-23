@@ -4,7 +4,6 @@ export const products = [
     name: 'Feline F45 Fully Synthetic',
     category: 'Fully Synthetic',
     viscosity: '5W-40',
-    api: 'API SP/SN PLUS',
     price: 185.00,
     rating: 4.9,
     imageLabel: 'FULLY SYNTHETIC',
@@ -12,8 +11,8 @@ export const products = [
     description: 'Ultimate performance for modern turbocharged engines. Provides maximum protection under extreme temperatures.',
     specs: [
       { label: 'Viscosity Grade', value: '5W-40' },
-      { label: 'API Standard', value: 'SP / SN PLUS' },
-      { label: 'Base Oil', value: 'Group IV PAO' }
+      { label: 'Base Oil', value: 'Group IV PAO' },
+      { label: 'Type', value: 'Fully Synthetic' }
     ],
     variants: [
       { size: '1L', price: 55.00, stock: 50 },
@@ -27,7 +26,6 @@ export const products = [
     name: 'Feline F30 Semi Synthetic',
     category: 'Semi Synthetic',
     viscosity: '10W-40',
-    api: 'API SN/CF',
     price: 125.00,
     rating: 4.7,
     imageLabel: 'SEMI SYNTHETIC',
@@ -35,8 +33,8 @@ export const products = [
     description: 'Advanced protection for daily commuters and high-mileage engines.',
     specs: [
       { label: 'Viscosity Grade', value: '10W-40' },
-      { label: 'API Standard', value: 'SN / CF' },
-      { label: 'Base Oil', value: 'Synthetic Blend' }
+      { label: 'Base Oil', value: 'Synthetic Blend' },
+      { label: 'Type', value: 'Semi Synthetic' }
     ],
     variants: [
       { size: '1L', price: 38.00, stock: 40 },
@@ -50,7 +48,6 @@ export const products = [
     name: 'Feline F20 Mineral Series',
     category: 'Mineral',
     viscosity: '15W-40',
-    api: 'API SL/CF',
     price: 85.00,
     rating: 4.5,
     imageLabel: 'MINERAL OIL',
@@ -58,8 +55,8 @@ export const products = [
     description: 'Reliable lubrication for older engine designs and light-duty commercial vehicles.',
     specs: [
       { label: 'Viscosity Grade', value: '15W-40' },
-      { label: 'API Standard', value: 'SL / CF' },
-      { label: 'Base Oil', value: 'Premium Mineral' }
+      { label: 'Base Oil', value: 'Premium Mineral' },
+      { label: 'Type', value: 'Mineral' }
     ],
     variants: [
       { size: '1L', price: 25.00, stock: 100 },
@@ -73,7 +70,6 @@ export const products = [
     name: 'Feline T80 Heavy Duty',
     category: 'Heavy Duty',
     viscosity: '15W-40',
-    api: 'API CK-4/SN',
     price: 240.00,
     rating: 4.9,
     imageLabel: 'HEAVY DUTY',
@@ -81,8 +77,8 @@ export const products = [
     description: 'Industrial-strength diesel engine oil for trucks, tractors, and heavy machinery.',
     specs: [
       { label: 'Viscosity Grade', value: '15W-40' },
-      { label: 'API Standard', value: 'CK-4 / SN' },
-      { label: 'Base Oil', value: 'Fully Synthetic' }
+      { label: 'Base Oil', value: 'Fully Synthetic' },
+      { label: 'Application', value: 'Diesel Engines' }
     ],
     variants: [
       { size: '1L', price: 65.00, stock: 30 },
@@ -96,7 +92,6 @@ export const products = [
     name: 'Feline G90 Gear Oil',
     category: 'Industrial',
     viscosity: '80W-90',
-    api: 'API GL-5',
     price: 45.00,
     rating: 4.8,
     imageLabel: 'GEAR OIL',
@@ -104,8 +99,8 @@ export const products = [
     description: 'Extreme pressure gear lubricant for differentials and manual transmissions.',
     specs: [
       { label: 'Viscosity Grade', value: '80W-90' },
-      { label: 'API Standard', value: 'GL-5' },
-      { label: 'Type', value: 'EP Lubricant' }
+      { label: 'Type', value: 'EP Lubricant' },
+      { label: 'Application', value: 'Gear & Transmission' }
     ],
     variants: [
       { size: '1L', price: 45.00, stock: 80 },
@@ -119,7 +114,6 @@ export const products = [
     name: 'Feline M50 Moto Series',
     category: 'Motorcycle',
     viscosity: '10W-40',
-    api: 'JASO MA2',
     price: 35.00,
     rating: 4.9,
     imageLabel: '4T MOTO',
@@ -127,7 +121,7 @@ export const products = [
     description: 'High-revving protection for 4-stroke motorcycle engines and wet-clutch systems.',
     specs: [
       { label: 'Viscosity Grade', value: '10W-40' },
-      { label: 'API Standard', value: 'SN / JASO MA2' },
+      { label: 'Standard', value: 'JASO MA2' },
       { label: 'Base Oil', value: 'Fully Synthetic' }
     ],
     variants: [

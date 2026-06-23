@@ -107,7 +107,7 @@ export default function Hero({ setView }) {
             {[
               { value: '5', unit: '+', label: 'Product Lines' },
               { value: '10', unit: 'K+', label: 'Satisfied Clients' },
-              { value: 'API', unit: '', label: 'Certified' },
+              { value: '15', unit: '+', label: 'Years Experience' },
             ].map((s) => (
               <div className="hero__stat" key={s.label}>
                 <div className="hero__stat-value">

@@ -15,7 +15,7 @@ export default function Certifications() {
     },
     {
       icon: <TbShieldCheck />,
-      code: 'API CERTIFIED',
+      code: 'QUALITY ASSURED',
       title: t('certs.item2.title'),
       desc: t('certs.item2.desc'),
     },

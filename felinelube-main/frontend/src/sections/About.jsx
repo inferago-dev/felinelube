@@ -11,7 +11,7 @@ export default function About() {
   const metrics = [
     { value: '10', unit: 'K+', label: t('hero.label') },
     { value: '5', unit: '+', label: t('nav.products') },
-    { value: 'API', unit: '', label: 'Certified Oils' },
+    { value: '15', unit: '+', label: 'Years Experience' },
     { value: 'MY', unit: '', label: 'Manufactured' },
   ]
 

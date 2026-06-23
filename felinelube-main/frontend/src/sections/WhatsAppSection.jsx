@@ -114,7 +114,7 @@ export default function WhatsAppSection() {
                 transition={{ delay: 0.6, duration: 0.4 }}
                 viewport={{ once: true }}
               >
-                For the X70's 1.8T engine we recommend our <strong>Feline F45 5W-30</strong> — full synthetic, API SN+ certified. 🔥
+                For the X70's 1.8T engine we recommend our <strong>Feline F45 5W-30</strong> — fully synthetic, premium formulation for turbo engines. 🔥
               </motion.div>
 
               <motion.div
