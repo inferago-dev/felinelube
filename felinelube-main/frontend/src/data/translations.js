@@ -22,7 +22,7 @@ export const translations = {
       para1: 'Feline Genuine Lubricants is a Malaysia-based premium lubricant manufacturer committed to delivering advanced lubrication technology.',
       para2: 'Our fleet and distribution network ensures our oils reach partners across the region with uncompromising reliability.',
       point1: 'Registered Malaysian manufacturer',
-      point2: 'Quality-assured lubricant formulations',
+      point2: 'Certified lubricant formulations',
       point3: 'Advanced base oil engineering',
       point4: 'Nationwide logistics network',
       point5: 'Strict quality assurance',
@@ -80,7 +80,7 @@ export const translations = {
       desc: 'Our commitment to excellence is backed by international certifications and quality assurance.',
       verified: 'Verified Status',
       item1: { title: 'Quality Management', desc: 'ISO 9001:2015 certification for consistent product quality.' },
-      item2: { title: 'Engine Oil Standards', desc: 'Formulated to meet international engine oil performance standards.' },
+      item2: { title: 'Certified Performance', desc: 'Formulated to meet international engine oil certification standards.' },
       item3: { title: 'Environmental Management', desc: 'ISO 14001:2015 certification for environmental responsibility.' }
     },
     products: {
@@ -122,7 +122,7 @@ export const translations = {
       para1: 'Feline Genuine Lubricants adalah pengeluar pelincir premium yang berpangkalan di Malaysia, komited untuk menyampaikan teknologi pelinciran termaju.',
       para2: 'Rangkaian logistik dan pengedaran kami memastikan minyak kami sampai ke rakan kongsi di seluruh rantau dengan kebolehpercayaan tanpa kompromi.',
       point1: 'Pengeluar berdaftar di Malaysia',
-      point2: 'Rumusan pelincir yang dijamin kualiti',
+      point2: 'Rumusan pelincir yang diperakui',
       point3: 'Kejuruteraan minyak asas termaju',
       point4: 'Rangkaian logistik seluruh negara',
       point5: 'Jaminan kualiti yang ketat',
@@ -180,7 +180,7 @@ export const translations = {
       desc: 'Komitmen kami terhadap kecemerlangan disokong oleh pensijilan antarabangsa dan jaminan kualiti.',
       verified: 'Status Disahkan',
       item1: { title: 'Pengurusan Kualiti', desc: 'Pensijilan ISO 9001:2015 untuk kualiti produk yang konsisten.' },
-      item2: { title: 'Piawaian Minyak Enjin', desc: 'Dirumus untuk memenuhi piawaian prestasi minyak enjin antarabangsa.' },
+      item2: { title: 'Prestasi Diiktiraf', desc: 'Dirumus untuk memenuhi piawaian pensijilan minyak enjin antarabangsa.' },
       item3: { title: 'Pengurusan Alam Sekitar', desc: 'Pensijilan ISO 14001:2015 untuk tanggungjawab alam sekitar.' }
     },
     products: {

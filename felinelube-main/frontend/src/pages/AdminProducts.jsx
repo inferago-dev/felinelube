@@ -406,7 +406,7 @@ export default function AdminProducts() {
                     </select>
                   </div>
                   <div className="auth-form-group">
-                    <label>API Rating</label>
+                    <label>Certified Rating</label>
                     <input className="auth-input" type="text" value={formData.apiRating} onChange={e => setFormData({...formData, apiRating: e.target.value})} />
                   </div>
                   <div className="auth-form-group">

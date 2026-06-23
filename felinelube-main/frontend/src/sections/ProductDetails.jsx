@@ -116,7 +116,7 @@ const ProductDetails = () => {
         >
           <div className="prod-info__cat">{productData.category}</div>
           <h1 className="prod-info__name">{productData.name}</h1>
-          <div className="prod-info__api">{productData.api}</div>
+          <div className="prod-info__api">{productData.apiRating}</div>
           <div className="prod-info__price">RM {selectedVariant.price.toFixed(2)}</div>
           <p className="prod-info__desc">{productData.description}</p>
           
