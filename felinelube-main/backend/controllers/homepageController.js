@@ -1,4 +1,8 @@
 const prisma = require('../config/db');
+const { sanitizeStr } = require('../utils/sanitize');
+
+// Whitelist of valid homepage section names to prevent arbitrary DB writes
+const ALLOWED_SECTIONS = ['Hero', 'About', 'Features', 'CTA', 'Footer', 'Banner', 'Announcement'];
 
 // @desc    Get all homepage sections
 // @route   GET /api/homepage/admin/all
@@ -8,7 +12,8 @@ const getHomepageSections = async (req, res) => {
     const sections = await prisma.homepageContent.findMany();
     res.json(sections);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('getHomepageSections error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -17,18 +22,40 @@ const getHomepageSections = async (req, res) => {
 // @access  Private (Admin)
 const updateHomepageSection = async (req, res) => {
   try {
-    const { section } = req.params;
+    // SANITIZE: section route param — only allow whitelisted section names
+    const section = req.params.section;
+    if (!section || !ALLOWED_SECTIONS.includes(section)) {
+      return res.status(400).json({
+        message: `Invalid section. Must be one of: ${ALLOWED_SECTIONS.join(', ')}`,
+      });
+    }
+
     const { content } = req.body;
 
+    // SANITIZE: content must be a plain object (not arbitrary strings or arrays)
+    if (!content || typeof content !== 'object' || Array.isArray(content)) {
+      return res.status(400).json({ message: 'Content must be a plain object' });
+    }
+
+    // SANITIZE: sanitize each string field inside the content object
+    const cleanContent = {};
+    for (const [key, val] of Object.entries(content)) {
+      // Only allow string values — skip non-strings silently
+      if (typeof val === 'string') {
+        cleanContent[sanitizeStr(key, 100)] = sanitizeStr(val, 2000);
+      }
+    }
+
     const updatedSection = await prisma.homepageContent.upsert({
-      where: { section },
-      update: { content },
-      create: { section, content }
+      where:  { section },
+      update: { content: cleanContent },
+      create: { section, content: cleanContent },
     });
 
     res.json(updatedSection);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('updateHomepageSection error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -38,7 +65,8 @@ const getPublicHomepageSections = async (req, res) => {
     const sections = await prisma.homepageContent.findMany();
     res.json(sections);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('getPublicHomepageSections error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

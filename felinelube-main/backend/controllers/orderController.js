@@ -1,11 +1,10 @@
 const prisma = require('../config/db');
+const {
+  sanitizeStr, sanitizeFloat, sanitizeInt, safeJsonParse, isValidEmail, isValidMalaysianPhone
+} = require('../utils/sanitize');
 
 // Whitelist of allowed order statuses
 const ALLOWED_ORDER_STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
-
-// Helper: sanitize string input
-const sanitizeStr = (val, maxLen = 500) =>
-  typeof val === 'string' ? val.trim().slice(0, maxLen) : undefined;
 
 // ---------------------------------------------------------------
 // @desc    Create new order
@@ -25,53 +24,64 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: 'Missing required order fields' });
     }
 
-    // Validate and sanitize scalar fields
-    const parsedTotal = parseFloat(totalAmount);
-    if (isNaN(parsedTotal) || parsedTotal <= 0) {
-      return res.status(400).json({ message: 'Invalid order total' });
+    // SANITIZE: customer name
+    const cleanName = sanitizeStr(customerName, 150);
+    if (!cleanName) return res.status(400).json({ message: 'Invalid customer name' });
+
+    // SANITIZE: phone number
+    const cleanPhone = sanitizeStr(customerPhone, 30);
+    if (!cleanPhone || !isValidMalaysianPhone(cleanPhone)) {
+      return res.status(400).json({ message: 'Invalid phone number format' });
     }
 
-    // Limit order items to a reasonable count to prevent resource abuse
+    // SANITIZE: address
+    const cleanAddress = sanitizeStr(address, 500);
+    if (!cleanAddress) return res.status(400).json({ message: 'Invalid address' });
+
+    // SANITIZE: total amount
+    const parsedTotal = sanitizeFloat(totalAmount, 0.01);
+    if (parsedTotal === null) return res.status(400).json({ message: 'Invalid order total' });
+
+    // SANITIZE: payment method
+    const cleanPayment = sanitizeStr(paymentMethod, 50);
+
+    // Limit order items count to prevent resource abuse
     if (items.length > 50) {
       return res.status(400).json({ message: 'Order contains too many items' });
     }
 
-    // Validate each order item
+    // SANITIZE + validate each order item
     for (const item of items) {
-      const qty = parseInt(item.quantity, 10);
-      const price = parseFloat(item.price);
-      if (!item.productId || typeof item.productId !== 'string') {
+      const qty   = sanitizeInt(item.quantity, 1, 9999);
+      const price = sanitizeFloat(item.price, 0);
+      if (!item.productId || typeof item.productId !== 'string' || item.productId.length > 128) {
         return res.status(400).json({ message: 'Invalid product reference in order' });
       }
-      if (isNaN(qty) || qty <= 0 || qty > 9999) {
-        return res.status(400).json({ message: 'Invalid item quantity' });
-      }
-      if (isNaN(price) || price < 0) {
-        return res.status(400).json({ message: 'Invalid item price' });
-      }
+      if (qty === null) return res.status(400).json({ message: 'Invalid item quantity' });
+      if (price === null) return res.status(400).json({ message: 'Invalid item price' });
     }
 
-    // Generate a cryptographically more unique order number
-    const timestamp = Date.now().toString(36).toUpperCase();
-    const random = Math.random().toString(36).substring(2, 7).toUpperCase();
+    // Generate a unique order number
+    const timestamp   = Date.now().toString(36).toUpperCase();
+    const random      = Math.random().toString(36).substring(2, 7).toUpperCase();
     const orderNumber = `FEL-${timestamp}-${random}`;
 
     const order = await prisma.order.create({
       data: {
         orderNumber,
-        customerName: sanitizeStr(customerName, 150),
-        customerPhone: sanitizeStr(customerPhone, 30),
-        address: sanitizeStr(address, 500),
-        totalAmount: parsedTotal,
-        paymentMethod: sanitizeStr(paymentMethod, 50),
+        customerName:  cleanName,
+        customerPhone: cleanPhone,
+        address:       cleanAddress,
+        totalAmount:   parsedTotal,
+        paymentMethod: cleanPayment,
         // SECURITY: userId is sourced from the authenticated JWT, not the request body
         userId: authenticatedUserId,
         items: {
           create: items.map((item) => ({
-            productId: item.productId,
-            quantity: parseInt(item.quantity, 10),
-            price: parseFloat(item.price),
-            variantSize: typeof item.variantSize === 'string' ? item.variantSize : 'Base',
+            productId:   sanitizeStr(item.productId, 128),
+            quantity:    sanitizeInt(item.quantity, 1, 9999),
+            price:       sanitizeFloat(item.price, 0),
+            variantSize: typeof item.variantSize === 'string' ? sanitizeStr(item.variantSize, 50) : 'Base',
           })),
         },
       },
@@ -111,11 +121,10 @@ exports.getOrders = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const { id } = req.params;
 
-    if (!id || typeof id !== 'string') {
-      return res.status(400).json({ message: 'Invalid order ID' });
-    }
+    // SANITIZE: route param id
+    const id = sanitizeStr(req.params.id, 128);
+    if (!id) return res.status(400).json({ message: 'Invalid order ID' });
 
     // Validate status against whitelist to prevent arbitrary data injection
     if (!status || !ALLOWED_ORDER_STATUSES.includes(status)) {
@@ -126,15 +135,9 @@ exports.updateOrderStatus = async (req, res) => {
 
     // SECURITY: Verify the order exists before mutating — prevents Prisma error leaks
     const existing = await prisma.order.findUnique({ where: { id }, select: { id: true } });
-    if (!existing) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+    if (!existing) return res.status(404).json({ message: 'Order not found' });
 
-    const order = await prisma.order.update({
-      where: { id },
-      data: { status },
-    });
-
+    const order = await prisma.order.update({ where: { id }, data: { status } });
     return res.json(order);
   } catch (error) {
     console.error('updateOrderStatus error:', error);
@@ -168,25 +171,28 @@ exports.getMyOrders = async (req, res) => {
 // ---------------------------------------------------------------
 exports.updateOrderDetails = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { adminNotes, courierName, trackingId, estimatedDelivery, status } = req.body;
+    // SANITIZE: route param id
+    const id = sanitizeStr(req.params.id, 128);
+    if (!id) return res.status(400).json({ message: 'Invalid order ID' });
 
-    if (!id || typeof id !== 'string') {
-      return res.status(400).json({ message: 'Invalid order ID' });
-    }
+    const { adminNotes, courierName, trackingId, estimatedDelivery, status } = req.body;
 
     // SECURITY: Verify the order exists before mutating — prevents Prisma error leaks
     const existing = await prisma.order.findUnique({ where: { id }, select: { id: true } });
-    if (!existing) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+    if (!existing) return res.status(404).json({ message: 'Order not found' });
 
     const updateData = {};
-    if (adminNotes !== undefined) updateData.adminNotes = sanitizeStr(adminNotes, 2000);
-    if (courierName !== undefined) updateData.courierName = sanitizeStr(courierName, 100);
-    if (trackingId !== undefined) updateData.trackingId = sanitizeStr(trackingId, 100);
+    if (adminNotes        !== undefined) updateData.adminNotes    = sanitizeStr(adminNotes, 2000);
+    if (courierName       !== undefined) updateData.courierName   = sanitizeStr(courierName, 100);
+    if (trackingId        !== undefined) updateData.trackingId    = sanitizeStr(trackingId, 100);
     if (estimatedDelivery !== undefined) {
-      updateData.estimatedDelivery = estimatedDelivery ? new Date(estimatedDelivery) : null;
+      if (estimatedDelivery) {
+        const d = new Date(estimatedDelivery);
+        if (isNaN(d.getTime())) return res.status(400).json({ message: 'Invalid estimated delivery date' });
+        updateData.estimatedDelivery = d;
+      } else {
+        updateData.estimatedDelivery = null;
+      }
     }
     if (status !== undefined) {
       if (!ALLOWED_ORDER_STATUSES.includes(status)) {
@@ -195,11 +201,7 @@ exports.updateOrderDetails = async (req, res) => {
       updateData.status = status;
     }
 
-    const order = await prisma.order.update({
-      where: { id },
-      data: updateData,
-    });
-
+    const order = await prisma.order.update({ where: { id }, data: updateData });
     return res.json(order);
   } catch (error) {
     console.error('updateOrderDetails error:', error);
@@ -214,29 +216,18 @@ exports.updateOrderDetails = async (req, res) => {
 // ---------------------------------------------------------------
 exports.uploadInvoice = async (req, res) => {
   try {
-    const { id } = req.params;
+    // SANITIZE: route param id
+    const id = sanitizeStr(req.params.id, 128);
+    if (!id) return res.status(400).json({ message: 'Invalid order ID' });
 
-    if (!id || typeof id !== 'string') {
-      return res.status(400).json({ message: 'Invalid order ID' });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
+    if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
     // SECURITY: Verify the order exists before mutating — prevents Prisma error leaks
     const existing = await prisma.order.findUnique({ where: { id }, select: { id: true } });
-    if (!existing) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+    if (!existing) return res.status(404).json({ message: 'Order not found' });
 
     const invoiceUrl = `/${req.file.path.replace(/\\/g, '/')}`;
-
-    const order = await prisma.order.update({
-      where: { id },
-      data: { invoiceUrl },
-    });
-
+    const order = await prisma.order.update({ where: { id }, data: { invoiceUrl } });
     return res.json(order);
   } catch (error) {
     console.error('uploadInvoice error:', error);

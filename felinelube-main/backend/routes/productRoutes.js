@@ -23,6 +23,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max per file
   fileFilter: function (req, file, cb) {
     const filetypes = /jpg|jpeg|png|webp|pdf/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -30,7 +31,7 @@ const upload = multer({
     if (extname && mimetype) {
       return cb(null, true);
     } else {
-      cb('Images and PDFs only!');
+      cb(new Error('Images and PDFs only!'));
     }
   }
 });

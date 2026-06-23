@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const prisma = require('../config/db');
 const crypto = require('crypto');
 const { sendPasswordReset } = require('../utils/emailService');
+const { sanitizeEmail, sanitizeStr, isValidEmail } = require('../utils/sanitize');
 
 // ============================================================
 // SECURITY: JWT_SECRET MUST come from environment variable.
@@ -23,9 +24,9 @@ const generateToken = (id) => {
   return jwt.sign({ id }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
 };
 
-// Helper: sanitize a string (trim, lowercase email)
-const sanitizeEmail = (email) => (typeof email === 'string' ? email.trim().toLowerCase() : '');
-const sanitizeName  = (name)  => (typeof name  === 'string' ? name.trim().slice(0, 100) : '');
+// sanitizeEmail and sanitizeStr are imported from utils/sanitize
+// (sanitizeName is an alias for sanitizeStr with a 100-char cap)
+const sanitizeName = (name) => sanitizeStr(name, 100) || '';
 
 // ---------------------------------------------------------------
 // @desc    Register a new user

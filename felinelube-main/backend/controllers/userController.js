@@ -1,4 +1,10 @@
 const prisma = require('../config/db');
+const {
+  sanitizeStr, sanitizeEmail, isValidEmail, isValidMalaysianPhone
+} = require('../utils/sanitize');
+
+// Allowed user statuses — whitelist to prevent arbitrary string injection
+const ALLOWED_USER_STATUSES = ['ACTIVE', 'BANNED', 'SUSPENDED'];
 
 // @desc    Get user profile & notifications
 // @route   GET /api/users/profile
@@ -19,13 +25,11 @@ const getUserProfile = async (req, res) => {
       }
     });
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
+    if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('getUserProfile error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -36,23 +40,27 @@ const updateUserProfile = async (req, res) => {
   try {
     const { name, phone, address } = req.body;
 
+    // SANITIZE: name
+    const cleanName = name ? sanitizeStr(name, 100) : undefined;
+
+    // SANITIZE + validate phone
+    let cleanPhone = undefined;
     if (phone) {
-      const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
-      const myPhoneRegex = /^(?:\+60|60|0)1[0-9]{8,9}$/;
-      if (!myPhoneRegex.test(cleanPhone)) {
+      cleanPhone = sanitizeStr(phone, 30);
+      if (!cleanPhone || !isValidMalaysianPhone(cleanPhone)) {
         return res.status(400).json({ message: 'Invalid Malaysia phone number format' });
       }
     }
 
-    // Optional: password update could go here, but usually requires separate logic for security
-    // We will just do basic profile info here.
+    // SANITIZE: address
+    const cleanAddress = address ? sanitizeStr(address, 500) : undefined;
 
     const updatedUser = await prisma.user.update({
       where: { id: req.user.id },
       data: {
-        name: name || undefined,
-        phone: phone || undefined,
-        address: address || undefined,
+        name:    cleanName,
+        phone:   cleanPhone,
+        address: cleanAddress,
       },
       select: {
         id: true,
@@ -65,7 +73,8 @@ const updateUserProfile = async (req, res) => {
 
     res.json(updatedUser);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('updateUserProfile error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -80,7 +89,8 @@ const getUserNotifications = async (req, res) => {
     });
     res.json(notifications);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('getUserNotifications error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -111,25 +121,21 @@ const adminGetUsers = async (req, res) => {
     });
     res.json(users);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('adminGetUsers error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
 // @desc    Update user status (ban/suspend/activate)
 // @route   PUT /api/users/admin/:id/status
 // @access  Private (Admin)
-// Allowed user statuses — whitelist to prevent arbitrary string injection
-const ALLOWED_USER_STATUSES = ['ACTIVE', 'BANNED', 'SUSPENDED'];
-
 const adminUpdateUserStatus = async (req, res) => {
   try {
-    const { id } = req.params;
-    const { status, banReason } = req.body;
+    // SANITIZE: route param id
+    const id = sanitizeStr(req.params.id, 128);
+    if (!id) return res.status(400).json({ message: 'Invalid user ID' });
 
-    // SECURITY: Validate id type
-    if (!id || typeof id !== 'string') {
-      return res.status(400).json({ message: 'Invalid user ID' });
-    }
+    const { status, banReason } = req.body;
 
     // SECURITY: Validate status against whitelist — prevents arbitrary status injection
     if (!status || !ALLOWED_USER_STATUSES.includes(status)) {
@@ -138,17 +144,18 @@ const adminUpdateUserStatus = async (req, res) => {
       });
     }
 
+    // SANITIZE: banReason
+    const cleanBanReason = banReason ? sanitizeStr(banReason, 500) : null;
+
     // SECURITY: Verify the user exists before mutating — prevents Prisma error leaks
     const existing = await prisma.user.findUnique({ where: { id }, select: { id: true } });
-    if (!existing) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!existing) return res.status(404).json({ message: 'User not found' });
 
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
         status,
-        banReason: (status === 'BANNED' || status === 'SUSPENDED') ? (banReason || null) : null
+        banReason: (status === 'BANNED' || status === 'SUSPENDED') ? cleanBanReason : null
       },
       select: {
         id: true, name: true, email: true,
@@ -163,29 +170,24 @@ const adminUpdateUserStatus = async (req, res) => {
   }
 };
 
-// @desc    Get public statistics (registered users count, online visitors & active logins)
+// @desc    Get public statistics
 // @route   GET /api/users/public-stats
 // @access  Public
 const getPublicStats = async (req, res) => {
   try {
     const registeredCount = await prisma.user.count();
-
-    // Generate stable-ish numbers based on the hour of the day so it changes but doesn't feel erratic.
     const hour = new Date().getHours();
-    
-    // We want viewers to be between 8 and 24, varying by hour
-    // And logged in users to be between 3 and 10
-    // Let's create a deterministic but changing seed.
-    const activeViewers = 8 + ((hour * 7) % 17);
-    const activeLoggedIn = 3 + ((hour * 3) % 8);
+    const activeViewers  = 8  + ((hour * 7) % 17);
+    const activeLoggedIn = 3  + ((hour * 3) % 8);
 
     res.json({
-      registeredCount: registeredCount || 150, // default fallback if DB is empty
+      registeredCount: registeredCount || 150,
       activeViewers,
       activeLoggedIn
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('getPublicStats error:', error);
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
@@ -197,4 +199,3 @@ module.exports = {
   adminUpdateUserStatus,
   getPublicStats
 };
-

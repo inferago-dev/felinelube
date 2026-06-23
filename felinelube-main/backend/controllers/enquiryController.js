@@ -1,5 +1,5 @@
 const prisma = require('../config/db');
-const xss = require('xss');
+const { sanitizeStr, sanitizeEmail, isValidEmail } = require('../utils/sanitize');
 
 // ---------------------------------------------------------------
 // @desc    Submit new Enquiry
@@ -14,25 +14,25 @@ exports.submitEnquiry = async (req, res) => {
       return res.status(400).json({ message: 'Please provide name, email, and message.' });
     }
 
-    // Basic email validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({ message: 'Invalid email format.' });
-    }
+    // SANITIZE: all fields via central utility
+    const cleanName    = sanitizeStr(name, 100);
+    const cleanEmail   = sanitizeEmail(email);
+    const cleanMessage = sanitizeStr(message, 1000);
 
-    if (message.length < 10 || message.length > 1000) {
-      return res.status(400).json({ message: 'Message must be between 10 and 1000 characters.' });
+    if (!cleanName)  return res.status(400).json({ message: 'Invalid name.' });
+    if (!isValidEmail(cleanEmail)) return res.status(400).json({ message: 'Invalid email format.' });
+    if (!cleanMessage || cleanMessage.length < 10) {
+      return res.status(400).json({ message: 'Message must be at least 10 characters.' });
     }
 
     const enquiry = await prisma.enquiry.create({
       data: {
-        name: xss(name.trim().slice(0, 100)),
-        email: email.trim().toLowerCase(),
-        message: xss(message.trim())
+        name:    cleanName,
+        email:   cleanEmail,
+        message: cleanMessage,
       }
     });
 
-    // Optional: Add Telegram logic here if needed in the future
-    
     return res.status(201).json({ message: 'Enquiry submitted successfully!', id: enquiry.id });
   } catch (error) {
     console.error('submitEnquiry error:', error);

@@ -16,6 +16,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max for invoices (PDF)
   fileFilter: function (req, file, cb) {
     const filetypes = /pdf|jpg|jpeg|png/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
@@ -23,7 +24,7 @@ const upload = multer({
     if (extname && mimetype) {
       return cb(null, true);
     } else {
-      cb('Invoices must be PDF or Images!');
+      cb(new Error('Invoices must be PDF or Images!'));
     }
   }
 });
