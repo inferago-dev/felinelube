@@ -1,0 +1,306 @@
+/* ============================================================
+   WhatsApp Section — Homepage
+   Dark/gold industrial theme matching the rest of the site
+   ============================================================ */
+
+.wa-section {
+  position: relative;
+  padding: 100px 5%;
+  background: var(--color-bg, #0a0a0a);
+  overflow: hidden;
+}
+
+/* ── Background glow orbs ─────────────────────────────────── */
+.wa-section__bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+.wa-section__bg-orb--left {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(37, 211, 102, 0.07) 0%, transparent 70%);
+  top: -80px;
+  left: -100px;
+}
+.wa-section__bg-orb--right {
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.06) 0%, transparent 70%);
+  bottom: -60px;
+  right: -80px;
+}
+
+/* ── Layout ───────────────────────────────────────────────── */
+.wa-section__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+/* ── Left content ─────────────────────────────────────────── */
+.wa-section__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.wa-section__title {
+  font-size: clamp(2rem, 3.5vw, 2.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--color-text, #f0f0f0);
+  margin: 0;
+}
+
+.wa-section__green {
+  color: #25D366;
+  position: relative;
+}
+.wa-section__green::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #25D366, transparent);
+  border-radius: 2px;
+}
+
+.wa-section__desc {
+  font-size: 1.05rem;
+  line-height: 1.75;
+  color: var(--color-text-dim, #aaa);
+  max-width: 480px;
+  margin: 0;
+}
+
+/* ── Feature rows ─────────────────────────────────────────── */
+.wa-section__features {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.wa-section__feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: border-color 0.3s, background 0.3s;
+}
+.wa-section__feature:hover {
+  border-color: rgba(37, 211, 102, 0.2);
+  background: rgba(37, 211, 102, 0.05);
+}
+
+.wa-section__feature-icon {
+  font-size: 1.35rem;
+  color: #25D366;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.wa-section__feature-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text, #f0f0f0);
+  margin-bottom: 2px;
+}
+
+.wa-section__feature-desc {
+  font-size: 0.83rem;
+  color: var(--color-text-dim, #888);
+}
+
+/* ── CTA button ───────────────────────────────────────────── */
+.wa-section__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border-radius: 14px;
+  background: #25D366;
+  color: #000;
+  font-weight: 800;
+  font-size: 1rem;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 24px rgba(37, 211, 102, 0.3);
+  transition: all 0.25s ease;
+  width: fit-content;
+}
+.wa-section__cta:hover {
+  background: #1ebe5a;
+  color: #000;
+  text-decoration: none;
+}
+
+/* ── Right — Chat Card ────────────────────────────────────── */
+.wa-section__visual {
+  display: flex;
+  justify-content: center;
+}
+
+.wa-section__card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(18, 18, 18, 0.95);
+  border: 1px solid rgba(37, 211, 102, 0.2);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(37, 211, 102, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+}
+
+/* Card header */
+.wa-section__card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1.1rem 1.25rem;
+  background: rgba(37, 211, 102, 0.08);
+  border-bottom: 1px solid rgba(37, 211, 102, 0.15);
+}
+
+.wa-section__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #25D366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.25);
+}
+
+.wa-section__card-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #f0f0f0;
+}
+
+.wa-section__card-status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.77rem;
+  color: #25D366;
+  margin-top: 2px;
+}
+
+.wa-section__online-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #25D366;
+  box-shadow: 0 0 6px #25D366;
+  animation: wa-blink 2s ease-in-out infinite;
+}
+
+@keyframes wa-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Chat bubbles */
+.wa-section__chat {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  min-height: 220px;
+}
+
+.wa-section__bubble {
+  padding: 0.7rem 1rem;
+  border-radius: 16px;
+  font-size: 0.87rem;
+  line-height: 1.5;
+  max-width: 85%;
+}
+
+.wa-section__bubble--in {
+  background: rgba(255, 255, 255, 0.07);
+  color: #ddd;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.wa-section__bubble--out {
+  background: rgba(37, 211, 102, 0.15);
+  color: #e8ffe8;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+  border: 1px solid rgba(37, 211, 102, 0.2);
+}
+
+/* Input row */
+.wa-section__card-input {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.wa-section__card-placeholder {
+  font-size: 0.85rem;
+  color: #555;
+  flex: 1;
+}
+
+.wa-section__send-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #25D366;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .wa-section__inner {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .wa-section__visual {
+    order: -1;
+  }
+  .wa-section__card {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .wa-section {
+    padding: 60px 5%;
+  }
+  .wa-section__cta {
+    width: 100%;
+    justify-content: center;
+  }
+}

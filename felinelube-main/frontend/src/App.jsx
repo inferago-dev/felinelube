@@ -7,6 +7,7 @@ import Categories from './sections/Categories'
 import FeaturedProducts from './sections/FeaturedProducts'
 import WhyFeline from './sections/WhyFeline'
 import About from './sections/About'
+import WhatsAppSection from './sections/WhatsAppSection'
 import WhatsAppWidget from './components/WhatsAppWidget'
 import Contact from './sections/Contact'
 import CTA from './sections/CTA'
@@ -78,6 +79,7 @@ function PublicLayout() {
               <FeaturedProducts setView={setView} />
               <WhyFeline />
               <section id="about"><About /></section>
+              <WhatsAppSection />
             </>
           } />
           <Route path="/shop" element={<Shop setView={setView} />} />
