@@ -264,6 +264,29 @@ button {
   box-shadow: 0 0 20px rgba(212, 160, 23, 0.08);
 }
 
+.btn-whatsapp {
+  background: #25D366;
+  color: #ffffff !important;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.25);
+  font-weight: 700;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-whatsapp:hover {
+  background: #20ba5a;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.4);
+  transform: translateY(-2px) scale(1.01);
+  color: #ffffff !important;
+}
+
+.btn-whatsapp:active {
+  transform: translateY(0) scale(0.99);
+}
+
 /* Divider */
 .divider {
   width: 60px;

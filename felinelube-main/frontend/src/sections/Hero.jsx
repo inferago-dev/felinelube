@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { HiArrowRight, HiPlay } from 'react-icons/hi'
+import { FaWhatsapp } from 'react-icons/fa'
 import { useLanguage } from '../context/LanguageContext'
 import API_BASE from '../api'
 import './Hero.css'
@@ -101,6 +102,14 @@ export default function Hero({ setView }) {
             <button className="btn btn-secondary hero__btn-glass" onClick={() => scrollTo('#about')}>
               <HiPlay /> {t('nav.about')}
             </button>
+            <a 
+              href="https://api.whatsapp.com/send/?phone=60123315585&text=Hi%20Feline%20Lube%2C%20I%20have%20a%20question%20about..."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-whatsapp"
+            >
+              <FaWhatsapp size={18} /> WhatsApp
+            </a>
           </motion.div>
 
           <motion.div className="hero__stats" custom={4} variants={fadeUp} initial="hidden" animate="visible">
