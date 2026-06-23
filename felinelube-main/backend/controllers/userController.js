@@ -90,7 +90,19 @@ const getUserNotifications = async (req, res) => {
 const adminGetUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
-      include: {
+      // SECURITY: Explicitly select only safe fields — never expose password hash,
+      // resetToken, or resetTokenExpiry to any caller, even admins.
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        address: true,
+        status: true,
+        banReason: true,
+        isVerified: true,
+        createdAt: true,
+        updatedAt: true,
         _count: {
           select: { orders: true }
         }
@@ -106,22 +118,48 @@ const adminGetUsers = async (req, res) => {
 // @desc    Update user status (ban/suspend/activate)
 // @route   PUT /api/users/admin/:id/status
 // @access  Private (Admin)
+// Allowed user statuses — whitelist to prevent arbitrary string injection
+const ALLOWED_USER_STATUSES = ['ACTIVE', 'BANNED', 'SUSPENDED'];
+
 const adminUpdateUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, banReason } = req.body; // status: ACTIVE, BANNED, SUSPENDED
+    const { status, banReason } = req.body;
+
+    // SECURITY: Validate id type
+    if (!id || typeof id !== 'string') {
+      return res.status(400).json({ message: 'Invalid user ID' });
+    }
+
+    // SECURITY: Validate status against whitelist — prevents arbitrary status injection
+    if (!status || !ALLOWED_USER_STATUSES.includes(status)) {
+      return res.status(400).json({
+        message: `Invalid status. Must be one of: ${ALLOWED_USER_STATUSES.join(', ')}`,
+      });
+    }
+
+    // SECURITY: Verify the user exists before mutating — prevents Prisma error leaks
+    const existing = await prisma.user.findUnique({ where: { id }, select: { id: true } });
+    if (!existing) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
     const updatedUser = await prisma.user.update({
       where: { id },
       data: {
         status,
-        banReason: status === 'BANNED' || status === 'SUSPENDED' ? banReason : null
+        banReason: (status === 'BANNED' || status === 'SUSPENDED') ? (banReason || null) : null
+      },
+      select: {
+        id: true, name: true, email: true,
+        status: true, banReason: true, updatedAt: true
       }
     });
 
     res.json(updatedUser);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('adminUpdateUserStatus error:', error);
+    res.status(500).json({ message: 'Server error updating user status' });
   }
 };
 

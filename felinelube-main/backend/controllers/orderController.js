@@ -14,7 +14,11 @@ const sanitizeStr = (val, maxLen = 500) =>
 // ---------------------------------------------------------------
 exports.createOrder = async (req, res) => {
   try {
-    const { customerName, customerPhone, address, totalAmount, items, paymentMethod, userId } = req.body;
+    const { customerName, customerPhone, address, totalAmount, items, paymentMethod } = req.body;
+    // SECURITY (IDOR): userId MUST come from the authenticated session token,
+    // never from the request body. This prevents any caller from forging a
+    // userId to link orders to an arbitrary user account.
+    const authenticatedUserId = (req.user && req.userType === 'user') ? req.user.id : null;
 
     // Validate required fields
     if (!customerName || !customerPhone || !address || !totalAmount || !Array.isArray(items) || items.length === 0) {
@@ -60,8 +64,8 @@ exports.createOrder = async (req, res) => {
         address: sanitizeStr(address, 500),
         totalAmount: parsedTotal,
         paymentMethod: sanitizeStr(paymentMethod, 50),
-        // Only link to userId if it is a valid string (not injected null/object)
-        userId: (typeof userId === 'string' && userId.length > 0) ? userId : null,
+        // SECURITY: userId is sourced from the authenticated JWT, not the request body
+        userId: authenticatedUserId,
         items: {
           create: items.map((item) => ({
             productId: item.productId,
@@ -120,6 +124,12 @@ exports.updateOrderStatus = async (req, res) => {
       });
     }
 
+    // SECURITY: Verify the order exists before mutating — prevents Prisma error leaks
+    const existing = await prisma.order.findUnique({ where: { id }, select: { id: true } });
+    if (!existing) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
     const order = await prisma.order.update({
       where: { id },
       data: { status },
@@ -165,6 +175,12 @@ exports.updateOrderDetails = async (req, res) => {
       return res.status(400).json({ message: 'Invalid order ID' });
     }
 
+    // SECURITY: Verify the order exists before mutating — prevents Prisma error leaks
+    const existing = await prisma.order.findUnique({ where: { id }, select: { id: true } });
+    if (!existing) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
     const updateData = {};
     if (adminNotes !== undefined) updateData.adminNotes = sanitizeStr(adminNotes, 2000);
     if (courierName !== undefined) updateData.courierName = sanitizeStr(courierName, 100);
@@ -206,6 +222,12 @@ exports.uploadInvoice = async (req, res) => {
 
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // SECURITY: Verify the order exists before mutating — prevents Prisma error leaks
+    const existing = await prisma.order.findUnique({ where: { id }, select: { id: true } });
+    if (!existing) {
+      return res.status(404).json({ message: 'Order not found' });
     }
 
     const invoiceUrl = `/${req.file.path.replace(/\\/g, '/')}`;

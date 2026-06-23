@@ -58,7 +58,16 @@ app.use(cors({
   credentials: true,
 }));
 // ----------------------------------------------------------
+// JSON body parser with a size limit to prevent payload flood
+// MUST come BEFORE the XSS sanitizer so the body is already
+// parsed as an object when sanitizeBody runs.
+// ----------------------------------------------------------
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: false, limit: '10kb' }));
+
+// ----------------------------------------------------------
 // XSS: sanitize all string values in request body
+// (runs after JSON parsing so req.body is populated)
 // ----------------------------------------------------------
 const sanitizeBody = (req, res, next) => {
   if (req.body && typeof req.body === 'object') {
@@ -78,12 +87,6 @@ const sanitizeBody = (req, res, next) => {
 app.use(sanitizeBody);
 
 // ----------------------------------------------------------
-// JSON body parser with a size limit to prevent payload flood
-// ----------------------------------------------------------
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: false, limit: '10kb' }));
-
-// ----------------------------------------------------------
 // Rate limiting: 100 requests per IP per 15 minutes (global)
 // ----------------------------------------------------------
 const globalLimiter = rateLimit({
@@ -95,15 +98,17 @@ const globalLimiter = rateLimit({
 });
 app.use('/api/', globalLimiter);
 
+// Stricter limiter for auth endpoints — 15 attempts per 15 min per IP
+// SECURITY: This MUST remain active in production to block brute-force attacks.
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 1000, // Increased to 1000 to completely bypass rate limit issues during testing
+  max: 15,
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many authentication attempts, please try again later.' },
+  skipSuccessfulRequests: true, // only count failed/errored requests
 });
-// Temporarily disabling auth limiter so you don't get blocked during testing
-// app.use('/api/auth/', authLimiter);
+app.use('/api/auth/', authLimiter);
 
 // ----------------------------------------------------------
 // Static uploads directory
