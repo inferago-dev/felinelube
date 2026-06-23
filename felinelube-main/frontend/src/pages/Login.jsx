@@ -22,22 +22,41 @@ export default function Login() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to login');
       }
 
-      // Success - save token and user info
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify({
-        id: data.id,
-        name: data.name,
-        email: data.email
-      }));
-      
-      navigate('/profile');
+      // SECURITY: role is determined entirely by the backend — never the client.
+      // Admin credentials silently redirect to the dashboard with no visible hint
+      // that an admin portal exists in the public-facing UI.
+      if (data.role === 'ADMIN' || data.role === 'SUPER_ADMIN') {
+        localStorage.setItem('adminToken', data.token);
+        localStorage.setItem('adminUser', JSON.stringify({
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          role: data.role,
+        }));
+        // Evict any stale regular-user session so tokens don't coexist
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/admin/dashboard', { replace: true });
+      } else {
+        // Regular user flow
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify({
+          id: data.id,
+          name: data.name,
+          email: data.email,
+        }));
+        // Evict any stale admin session
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        navigate('/profile');
+      }
     } catch (err) {
       setError(err.message || 'An error occurred during login');
     } finally {
@@ -47,7 +66,7 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <motion.div 
+      <motion.div
         className="auth-card"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -65,14 +84,14 @@ export default function Login() {
             <label htmlFor="email">Email Address</label>
             <div className="auth-input-wrapper">
               <HiOutlineMail className="auth-input-icon" />
-              <input 
-                type="email" 
+              <input
+                type="email"
                 id="email"
                 className="auth-input"
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required 
+                required
               />
             </div>
           </div>
@@ -81,14 +100,14 @@ export default function Login() {
             <label htmlFor="password">Password</label>
             <div className="auth-input-wrapper">
               <HiOutlineLockClosed className="auth-input-icon" />
-              <input 
-                type="password" 
+              <input
+                type="password"
                 id="password"
                 className="auth-input"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required 
+                required
               />
             </div>
           </div>

@@ -85,11 +85,15 @@ const registerUser = async (req, res) => {
 };
 
 // ---------------------------------------------------------------
-// @desc    Authenticate a user
-// @route   POST /api/auth/login
+// @desc    Authenticate a user OR admin from one endpoint.
+//          Checks User table first, then Admin table.
+//          Returns role:'USER' or role:'ADMIN' in response.
+//          The frontend silently redirects admins to /admin/dashboard
+//          with no separate admin login page exposed publicly.
+// @route   POST /api/auth/login  (AND  POST /api/auth/unified-login)
 // @access  Public
 // ---------------------------------------------------------------
-const loginUser = async (req, res) => {
+const unifiedLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -98,37 +102,63 @@ const loginUser = async (req, res) => {
     }
 
     const cleanEmail = sanitizeEmail(email);
-
-    const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
-
-    // Use bcrypt.compare even when user is not found (prevents timing attack)
     const dummyHash = '$2a$12$dummyhashfordummycomparison000000000000000000000000000';
-    const passwordMatch = user
-      ? await bcrypt.compare(password, user.password)
+
+    // ── Step 1: check User table ──────────────────────────────
+    const user = await prisma.user.findUnique({ where: { email: cleanEmail } });
+    if (user) {
+      const match = await bcrypt.compare(password, user.password);
+      if (match) {
+        if (user.status !== 'ACTIVE') {
+          return res.status(403).json({ message: 'Account is suspended' });
+        }
+        // Regular user — return USER role
+        return res.json({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: 'USER',
+          token: generateToken(user.id),
+        });
+      }
+      // Wrong password — run dummy admin compare to keep timing uniform,
+      // then fall through to generic error.
+    }
+
+    // ── Step 2: check Admin table ─────────────────────────────
+    // SECURITY: Always run bcrypt.compare so response time doesn't reveal
+    // whether the email matched the User table or not.
+    const admin = await prisma.admin.findUnique({ where: { email: cleanEmail } });
+    const adminMatch = admin
+      ? await bcrypt.compare(password, admin.password)
       : await bcrypt.compare(password, dummyHash);
 
-    if (!passwordMatch || !user) {
-      // Single generic error message — never reveal whether email exists
-      return res.status(401).json({ message: 'Invalid credentials' });
+    if (adminMatch && admin) {
+      // Admin credentials matched — return ADMIN role
+      // The frontend stores this as adminToken and redirects silently.
+      // No admin-specific URL is ever revealed to normal visitors.
+      return res.json({
+        id: admin.id,
+        name: admin.name,
+        email: admin.email,
+        role: admin.role || 'ADMIN',
+        token: generateToken(admin.id),
+      });
     }
 
-    if (user.status !== 'ACTIVE') {
-      return res.status(403).json({ message: 'Account is suspended' });
-    }
-
-
-
-    return res.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user.id),
-    });
+    // ── Generic error — never reveal which table or field failed ──
+    return res.status(401).json({ message: 'Invalid credentials' });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ message: 'Server error during login' });
   }
 };
+
+// loginUser is an alias for unifiedLogin (keeps existing route unchanged)
+const loginUser = unifiedLogin;
+
+
+
 
 // ---------------------------------------------------------------
 // @desc    Register a new admin

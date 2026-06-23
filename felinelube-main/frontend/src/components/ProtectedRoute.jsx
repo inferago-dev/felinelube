@@ -40,8 +40,8 @@ export default function ProtectedRoute({ children }) {
       timeout = setTimeout(() => {
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminUser');
-        navigate('/admin/login', { replace: true });
-        alert('Your session has expired due to inactivity. Please log in again.');
+        navigate('/login', { replace: true });
+        alert('Your session has expired. Please log in again.');
       }, 3600000);
     };
 
@@ -65,7 +65,7 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (isAuthenticated === false) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;

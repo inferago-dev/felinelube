@@ -64,10 +64,6 @@ export default function Checkout() {
       variantSize: item.variant.size
     }))
 
-    // Get optional user id if logged in
-    const userStr = localStorage.getItem('user')
-    const user = userStr ? JSON.parse(userStr) : null
-
     try {
       const res = await fetch(`${API_BASE}/orders`, {
         method: 'POST',
@@ -76,7 +72,8 @@ export default function Checkout() {
           ...formData,
           totalAmount: finalTotal,
           items,
-          userId: user ? user.id : undefined
+          // NOTE: userId is intentionally NOT sent here.
+          // The backend derives it from the JWT token so it cannot be forged.
         })
       })
 

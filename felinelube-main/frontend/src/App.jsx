@@ -27,7 +27,6 @@ import AdminLayout from './layouts/AdminLayout'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminProducts from './pages/AdminProducts'
 import AdminOrders from './pages/AdminOrders'
-import AdminLogin from './pages/AdminLogin'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminCustomers from './pages/AdminCustomers'
 import AdminHomepage from './pages/AdminHomepage'
@@ -103,21 +102,11 @@ function PublicLayout() {
 
       <Footer setView={setView} />
       <WhatsAppWidget />
-      <AdminHiddenShortcut />
     </div>
   )
 }
 
-function AdminHiddenShortcut() {
-  const navigate = useNavigate()
-  return (
-    <div 
-      onClick={() => navigate('/admin/login')} 
-      style={{ position: 'fixed', bottom: 10, left: 10, width: 10, height: 10, opacity: 0, cursor: 'pointer', zIndex: 9999 }} 
-      title="Admin Portal Access"
-    />
-  )
-}
+
 
 import { CartProvider } from './context/CartContext'
 import CartDrawer from './components/CartDrawer'
@@ -130,8 +119,9 @@ function App() {
         <ScrollToTop />
         <CartDrawer />
       <Routes>
-        {/* Admin Login page */}
-        <Route path="/admin/login" element={<AdminLogin />} />
+        {/* /admin/login redirects to the unified /login page.
+            The admin portal has no public-facing entry point. */}
+        <Route path="/admin/login" element={<Navigate to="/login" replace />} />
 
         {/* Protected Admin pages */}
         <Route 
